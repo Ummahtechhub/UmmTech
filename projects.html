@@ -1,0 +1,99 @@
+<link rel="stylesheet" href="general.css">
+<link rel="stylesheet" href="home.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="forms.css">
+<link rel="stylesheet" href="main-content.css">
+<link rel="stylesheet" href="responsive.css">
+<div class="content-page" data-page="projects">
+    <div class="project-spotlight-grid">
+        <div class="project-card project-spotlight-card">
+            <div class="project-spotlight-media">
+                <img src="https://i.ibb.co/sGHBcY2/Whats-App-Image-2026-01-30-at-5-21-43-PM.jpg" alt="Project showcase moment">
+                <div class="project-spotlight-overlay">Where Vision Leads</div>
+            </div>
+            <div class="project-spotlight-body">Ideas that move communities forward.</div>
+        </div>
+        <div class="project-card project-spotlight-card">
+            <div class="project-spotlight-media">
+                <img src="https://i.ibb.co/yndkG3Fz/Whats-App-Image-2026-01-30-at-5-21-42-PM.jpg" alt="Team project collaboration">
+                <div class="project-spotlight-overlay">Crafted with Care</div>
+            </div>
+            <div class="project-spotlight-body">Service, skill, and unity in action.</div>
+        </div>
+        <div class="project-card project-spotlight-card">
+            <div class="project-spotlight-media">
+                <img src="https://i.ibb.co/fG10XKsK/Whats-App-Image-2026-01-31-at-8-42-25-AM-2.jpg" alt="Project team proud moment">
+                <div class="project-spotlight-overlay">Built for Impact</div>
+            </div>
+            <div class="project-spotlight-body">Focused minds, powerful outcomes.</div>
+        </div>
+        <div class="project-card project-spotlight-card">
+            <div class="project-spotlight-media">
+                <img src="https://i.ibb.co/vvwtnJ9p/0V6A9187.jpg" alt="Project team in action">
+                <div class="project-spotlight-overlay">Impact in Motion</div>
+            </div>
+            <div class="project-spotlight-body">Built to serve with excellence.</div>
+        </div>
+        <div class="project-card project-spotlight-card">
+            <div class="project-spotlight-media">
+                <img src="https://i.ibb.co/RGwtXSdt/0V6A9215.jpg" alt="Project collaboration moment">
+                <div class="project-spotlight-overlay">Driven by Purpose</div>
+            </div>
+            <div class="project-spotlight-body">Unity, focus, and real-world results.</div>
+        </div>
+        <div class="project-card project-spotlight-card">
+            <div class="project-spotlight-media">
+                <img src="https://i.ibb.co/B2QCGnmF/0V6A9205.jpg" alt="Project leadership and growth">
+                <div class="project-spotlight-overlay">Vision to Reality</div>
+            </div>
+            <div class="project-spotlight-body">Bold ideas, powerful execution.</div>
+        </div>
+    </div>
+    <div style="background: #2e8b57; padding: 20px; text-align: center; margin-bottom: 20px; color: white;">
+        <h2 class="animated-title glow-title"><i class="fas fa-project-diagram"></i> Projects</h2>
+        <p>Where ideas turn into impact - Explore projects built to make a difference</p>
+    </div>
+
+    <div class="content-section" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); margin-bottom: 20px; padding: 20px;">
+        <button class="btn btn-primary" id="addProjectBtn">+ New Project</button>
+
+        <!-- Add Project Form (hidden by default) -->
+         <div id="projectFormContainer" class="settings-form" style="display:none; margin-top: 20px; padding: 20px; background: rgba(46,139,87,0.1); border-radius: 8px;">
+            <h3>Create New new project</h3>
+            <div class="form-group">
+               
+                <label>Project Name</label>
+                <input id="projectName" type="text" placeholder="Project title">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="projectDesc" rows="3" placeholder="Project description"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Upload Image/Video</label>
+                <input id="projectMedia" type="file" accept="image/*,video/*">
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select id="projectStatus">
+                    <option value="Active">Active</option>
+                    <option value="Planning">Planning</option>
+                    <option value="Completed">Completed</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Progress (%)</label>
+                <input id="projectProgress" type="number" min="0" max="100" placeholder="0-100">
+            </div>
+            <button class="btn btn-primary" id="saveProjectBtn">Save Project</button>
+            <button class="btn btn-secondary" id="cancelProjectBtn" style="margin-left: 10px;">Cancel</button>
+        </div>
+    </div>
+
+    <div class="content-section" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);">
+        <h3 style="margin-bottom: 20px; color: var(--primary-color);">Individual Projects</h3>
+        <div class="projects-grid" id="projectsGrid">
+            <!-- Projects will be loaded here from localStorage -->
+        </div>
+    </div>
+</div>

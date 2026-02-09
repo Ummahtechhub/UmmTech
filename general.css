@@ -1,0 +1,109 @@
+/* General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #2e8b57;
+    --secondary-color: #1a4d2e;
+    --accent-color: #ff6b6b;
+    --bg-color: #FAEBD7;
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --border-color: rgba(46, 139, 87, 0.2);
+    --text-primary: #1a1a1a;
+    --text-secondary: #555555;
+    --header-height: 60px;
+    --sidebar-width: 250px;
+    --shadow-sm: 0 2px 4px rgba(46, 139, 87, 0.1);
+    --shadow-md: 0 4px 12px rgba(46, 139, 87, 0.15);
+    --shadow-lg: 0 8px 24px rgba(46, 139, 87, 0.2);
+    --shadow-xl: 0 12px 32px rgba(46, 139, 87, 0.25);
+    --gradient-1: linear-gradient(135deg, rgba(46, 139, 87, 0.95), rgba(26, 77, 46, 0.95));
+    --gradient-2: linear-gradient(135deg, rgba(46, 139, 87, 0.1), rgba(102, 205, 170, 0.1));
+    --gradient-accent: linear-gradient(135deg, #2e8b57, #4cd964);
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html,
+body {
+    min-height: 100%;
+    background-color: var(--bg-color);
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+    animation: whiteGlowPulse 3s ease-in-out infinite;
+}
+
+@keyframes whiteGlowPulse {
+    0% {
+        text-shadow: 0 0 6px rgba(255, 255, 255, 0.35);
+    }
+    50% {
+        text-shadow: 0 0 14px rgba(255, 255, 255, 0.7);
+    }
+    100% {
+        text-shadow: 0 0 6px rgba(255, 255, 255, 0.35);
+    }
+}
+
+.page-header h1,
+.page-header h2,
+.page-header h3,
+.brand,
+#pageTitle,
+.glow-title {
+    color: var(--secondary-color);
+    text-shadow: none;
+    animation: none;
+}
+
+/* Force Antique White backgrounds globally (footer stays dark via its own styles) */
+.dashboard-container,
+.main-content,
+.sidebar {
+    background-color: var(--bg-color) !important;
+}
+
+img,
+video,
+iframe,
+svg {
+    max-width: 100%;
+    height: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+pre,
+code {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+@keyframes backgroundFade {
+    from {
+        background-color: var(--bg-color);
+    }
+    to {
+        background-color: var(--bg-color);
+    }
+}
+
+
+/* Dashboard Container */
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    background-color: transparent;
+}

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ummah Tech Hub Admin Panel</title>
+    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div class="header-left">
+                <button id="hamburgerToggle" class="hamburger-btn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <div class="logo">
+
+                </div>
+            </div>
+            <div class="header-center">
+                <h1>Ummah Tech Hub Admin Panel</h1>
+            </div>
+            <div class="header-right">
+                <span class="user-name">Admin</span>
+                <button class="btn btn-secondary logout-btn">
+                    <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+        <!-- Sidebar -->
+        <div id="mainContent" class="sidebar">
+            <nav class="sidebar-nav">
+                <button class="nav-btn" data-page="overview">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Dashboard Overview
+                </button>
+                <button class="nav-btn" data-page="upload-images">
+                    <i class="fas fa-images"></i>
+                    Upload Images
+                </button>
+                <button class="nav-btn" data-page="upload-videos">
+                    <i class="fas fa-video"></i>
+                    Upload Videos
+                </button>
+                <button class="nav-btn" data-page="upload-files">
+                    <i class="fas fa-file-alt"></i>
+                    Upload Files
+                </button>
+                <button class="nav-btn" data-page="manage-content">
+                    <i class="fas fa-edit"></i>
+                    Manage Content
+                </button>
+                <button class="nav-btn" data-page="repository-highlights">
+                    <i class="fas fa-link"></i>
+                    Repository Highlights
+                </button>
+                <button class="nav-btn" data-page="manage-settings">
+                    <i class="fas fa-cog"></i>
+                    Manage Settings
+                </button>
+                <button class="nav-btn" data-page="monitoring">
+                    <i class="fas fa-chart-line"></i>
+                    Overall Monitoring
+                </button>
+                <hr class="nav-divider">
+                <button class="nav-btn logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Dashboard Overview -->
+            <div id="overview" class="content-page active" data-page="overview">
+                <div class="page-header">
+                    <h2>Dashboard Overview</h2>
+                    <p>Monitor your website's performance and manage content.</p>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-images"></i>
+                        <div class="stat-value" id="totalImages">0</div>
+                        <div class="stat-label">Total Images</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-video"></i>
+                        <div class="stat-value" id="totalVideos">0</div>
+                        <div class="stat-label">Total Videos</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-file-alt"></i>
+                        <div class="stat-value" id="totalFiles">0</div>
+                        <div class="stat-label">Total Files</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <div class="stat-value" id="totalUsers">1</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload Images -->
+            <div id="upload-images" class="content-page" data-page="upload-images">
+                <div class="page-header">
+                    <h2>Upload Images</h2>
+                    <p>Upload multiple images with stories and destinations.</p>
+                </div>
+                <div class="content-section">
+                    <form id="imageUploadForm" class="upload-form">
+                        <div class="form-group">
+                            <label for="image-story">Short Story</label>
+                            <textarea id="image-story" name="story" placeholder="Describe the images..." required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="image-category">Destination</label>
+                            <select id="image-category" name="category" required>
+                                <option value="">Select destination...</option>
+                                <option value="event">Event</option>
+                                <option value="community-feed">Community Feed</option>
+                                <option value="others">Others</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="image-file">Select Images</label>
+                            <input type="file" id="image-file" name="files" multiple accept="image/*" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <span class="loading-spinner" style="display: none;"></span>
+                            Upload Images
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-page="overview">Back to Dashboard</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Upload Videos -->
+            <div id="upload-videos" class="content-page" data-page="upload-videos">
+                <div class="page-header">
+                    <h2>Upload Videos</h2>
+                    <p>Upload multiple videos with stories and destinations.</p>
+                </div>
+                <div class="content-section">
+                    <form id="videoUploadForm" class="upload-form">
+                        <div class="form-group">
+                            <label for="video-story">Short Story</label>
+                            <textarea id="video-story" name="story" placeholder="Describe the videos..." required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="video-category">Destination</label>
+                            <select id="video-category" name="category" required>
+                                <option value="">Select destination...</option>
+                                <option value="event">Event</option>
+                                <option value="community-feed">Community Feed</option>
+                                <option value="others">Others</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="video-file">Select Videos</label>
+                            <input type="file" id="video-file" name="files" multiple accept="video/*" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <span class="loading-spinner" style="display: none;"></span>
+                            Upload Videos
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-page="overview">Back to Dashboard</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Upload Files -->
+            <div id="upload-files" class="content-page" data-page="upload-files">
+                <div class="page-header">
+                    <h2>Upload Files</h2>
+                    <p>Upload multiple files with stories and destinations.</p>
+                </div>
+                <div class="content-section">
+                    <form id="fileUploadForm" class="upload-form">
+                        <div class="form-group">
+                            <label for="file-story">Short Story</label>
+                            <textarea id="file-story" name="story" placeholder="Describe the files..." required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="file-category">Destination</label>
+                            <select id="file-category" name="category" required>
+                                <option value="">Select destination...</option>
+                                <option value="event">Event</option>
+                                <option value="community-feed">Community Feed</option>
+                                <option value="others">Others</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="file-upload">Select Files</label>
+                            <input type="file" id="file-upload" name="files" multiple required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <span class="loading-spinner" style="display: none;"></span>
+                            Upload Files
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-page="overview">Back to Dashboard</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Manage Content -->
+            <div id="manage-content" class="content-page" data-page="manage-content">
+                <div class="page-header">
+                    <h2>Manage Content</h2>
+                    <p>View and manage uploaded images, videos, and files.</p>
+                </div>
+                <div class="content-section">
+                    <div id="contentGrid" class="content-grid">
+                        <!-- Content items will be loaded here -->
+                    </div>
+                    <button type="button" class="btn btn-secondary" data-page="overview">Back to Dashboard</button>
+                </div>
+            </div>
+
+            <!-- Repository Highlights -->
+            <div id="repository-highlights" class="content-page" data-page="repository-highlights">
+                <div class="page-header">
+                    <h2>Repository Highlights</h2>
+                    <p>Manage clickable highlight cards shown on the repository page.</p>
+                </div>
+                <div class="content-section">
+                    <form id="repoHighlightsForm" class="settings-form">
+                        <div class="form-group">
+                            <label for="repoHighlightTitle">Title</label>
+                            <input id="repoHighlightTitle" type="text" placeholder="e.g., CyberShujaa" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="repoHighlightDescription">Description</label>
+                            <textarea id="repoHighlightDescription" rows="3" placeholder="Short description" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="repoHighlightImage">Image URL</label>
+                            <input id="repoHighlightImage" type="url" placeholder="https://..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="repoHighlightLink">Official Website URL</label>
+                            <input id="repoHighlightLink" type="url" placeholder="https://official-site..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="repoHighlightOrder">Order (optional)</label>
+                            <input id="repoHighlightOrder" type="number" min="1" placeholder="1">
+                        </div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button type="submit" class="btn btn-primary">Save Highlight</button>
+                            <button type="button" class="btn btn-secondary" id="repoHighlightReset">Clear Form</button>
+                            <button type="button" class="btn btn-secondary" data-page="overview">Back to Dashboard</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Manage Settings -->
+            <div id="manage-settings" class="content-page" data-page="manage-settings">
+                <div class="page-header">
+                    <h2>Manage Settings</h2>
+                    <p>Configure website settings and monitor activities.</p>
+                </div>
+                <div class="content-section">
+                    <form id="settingsForm" class="settings-form">
+                        <div class="form-group">
+                            <label for="acting-project">Active Projects</label>
+                            <textarea id="acting-project" name="actingProject" placeholder="Describe active projects..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="team-members">Team Members</label>
+                            <textarea id="team-members" name="teamMembers" placeholder="List team members..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="upcoming-events">Upcoming Events</label>
+                            <textarea id="upcoming-events" name="upcomingEvents" placeholder="Describe upcoming events..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="innovations">Innovations</label>
+                            <textarea id="innovations" name="innovations" placeholder="Describe innovations..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Settings</button>
+                        <button type="button" class="btn btn-secondary" data-page="overview">Back to Dashboard</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Overall Monitoring -->
+            <div id="monitoring" class="content-page" data-page="monitoring">
+                <div class="page-header">
+                    <h2>Overall Monitoring</h2>
+                    <p>Monitor active projects, innovations, and team activities.</p>
+                </div>
+                <div class="content-section">
+                    <p>Monitoring features will be implemented here.</p>
+                    <button type="button" class="btn btn-secondary" data-page="overview">Back to Dashboard</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="admin.js"></script>
+</body>
+</html>

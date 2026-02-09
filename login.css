@@ -1,0 +1,229 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+:root {
+    --primary-color: #2e8b57;
+    --secondary-color: #1a4d2e;
+    --accent-color: #ff6b6b;
+    --bg-color: #FAEBD7;
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --text-primary: #1a1a1a;
+    --text-secondary: #555555;
+    --shadow-sm: 0 2px 4px rgba(46, 139, 87, 0.1);
+    --shadow-md: 0 4px 12px rgba(46, 139, 87, 0.15);
+    --shadow-lg: 0 8px 24px rgba(46, 139, 87, 0.2);
+    --gradient-accent: linear-gradient(135deg, #2e8b57, #4cd964);
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Roboto", sans-serif;
+    background: antiquewhite;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow-x: hidden;
+}
+
+img {
+    max-width: 120px;
+    height: 70px;
+    border: none;
+    margin-bottom: 20px;
+}
+
+.auth {
+    background: var(--card-bg);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 420px;
+    padding: 2.5rem;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+h2 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.auth p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+.input {
+    background: linear-gradient(135deg, rgba(46, 139, 87, 0.05), rgba(102, 205, 170, 0.03));
+    margin: 12px 0;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 2px solid rgba(46, 139, 87, 0.2);
+    width: 100%;
+    font-size: 14px;
+    color: var(--text-primary);
+    transition: var(--transition-smooth);
+}
+
+.input::placeholder {
+    color: rgba(85, 85, 85, 0.5);
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, rgba(46, 139, 87, 0.1), rgba(102, 205, 170, 0.05));
+    box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.1);
+}
+
+label {
+    font-size: 13px;
+    color: var(--text-primary);
+    font-weight: 500;
+    display: block;
+    text-align: left;
+    margin-bottom: 5px;
+}
+
+.input-type {
+    position: relative;
+    margin: 15px 0;
+}
+
+.input-type i {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-color);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.input-type i:hover {
+    color: var(--secondary-color);
+}
+
+button {
+    background: var(--gradient-accent);
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    width: 100%;
+    margin: 20px 0 10px;
+    transition: var(--transition-smooth);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+button:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #1a6b3a, #3db854);
+}
+
+button:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+.forgot-password {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 13px;
+    margin-top: 10px;
+    display: inline-block;
+    transition: var(--transition-smooth);
+}
+
+.forgot-password:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+
+.register-link {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-top: 15px;
+}
+
+.register-link a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition-smooth);
+}
+
+.register-link a:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
+    position: relative;
+    top: 1%;
+}
+button{
+    padding: 5px;
+    width: 120px;
+    border-radius: 5px;
+    color: white;
+    background-color: rgb(7, 95, 7);
+    font-size: 1.2rem;
+    border: none;
+}
+button:hover{
+    background-color: rgb(0, 124, 128);
+}
+a{
+    font-size: 0.75rem;
+    color: black;
+}
+a:hover{
+    color: blue;
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 12px;
+    }
+
+    .auth {
+        padding: 1.5rem;
+    }
+
+    img {
+        max-width: 90px;
+        height: auto;
+    }
+
+    button {
+        width: 100%;
+    }
+}

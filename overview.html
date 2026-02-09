@@ -1,0 +1,100 @@
+<link rel="stylesheet" href="general.css">
+<link rel="stylesheet" href="home.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="forms.css">
+<link rel="stylesheet" href="main-content.css">
+<link rel="stylesheet" href="responsive.css">
+<div class="content-page" data-page="overview">
+    <div class="overview-hero">
+        <div class="page-header" style="text-align: center;">
+            <h2 class="animated-title glow-title">Welcome back, <span id="userWelcomeName">Developer</span>!</h2>
+            <p>Your Ummah TechHub Dashboard</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-project-diagram"></i>
+                <div>
+                    <div class="stat-value" id="statProjects"></div>
+                    <div class="stat-label">Active Projects</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-users"></i>
+                <div>
+                    <div class="stat-value" id="statTeams"></div>
+                    <div class="stat-label">Team Members</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-calendar"></i>
+                <div>
+                    <div class="stat-value" id="statEvents"></div>
+                    <div class="stat-label">Upcoming Events</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-lightbulb"></i>
+                <div>
+                    <div class="stat-value" id="statInnovations"></div>
+                    <div class="stat-label">Innovations</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Access -->
+        <section class="section">
+            <h3>Quick Access</h3>
+            <div class="quick-access">
+                <button class="quick-btn" data-nav="projects">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>New Project</span>
+                </button>
+                <button class="quick-btn" data-nav="teams">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Create Team</span>
+                </button>
+                <button class="quick-btn" data-nav="events">
+                    <i class="fas fa-calendar-plus"></i>
+                    <span>Browse Events</span>
+                </button>
+                <button class="quick-btn" data-nav="profile">
+                    <i class="fas fa-user-circle"></i>
+                    <span>View Profile</span>
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Recent Activity -->
+    <section class="section">
+        <h3>Recent Activity</h3>
+        <div class="activity-list">
+            <div class="activity-item">
+                <div class="activity-icon"><i class="fas fa-code"></i></div>
+                <div class="activity-content">
+                    <h4>Mobile App Project Created</h4>
+                    <p>You started a new project - Cross-platform mobile development</p>
+                    <small>2 hours ago</small>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon"><i class="fas fa-users"></i></div>
+                <div class="activity-content">
+                    <h4>Joined Frontend Team</h4>
+                    <p>You were added to the Frontend Team</p>
+                    <small>5 hours ago</small>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon"><i class="fas fa-calendar"></i></div>
+                <div class="activity-content">
+                    <h4>Registered for Web Dev Summit</h4>
+                    <p>You registered for the upcoming Web Development Summit</p>
+                    <small>1 day ago</small>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

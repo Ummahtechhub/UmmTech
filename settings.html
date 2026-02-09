@@ -1,0 +1,78 @@
+<link rel="stylesheet" href="general.css">
+<link rel="stylesheet" href="home.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="forms.css">
+<link rel="stylesheet" href="main-content.css">
+<link rel="stylesheet" href="responsive.css">
+<div class="content-page" data-page="settings">
+                <div class="page-header" style="margin-bottom: 16px;">
+                    <h2 class="glow-title" style="animation: fadeInUp 1s ease-out;"><i class="fas fa-cog"></i> Settings</h2>
+                    <p>Manage your preferences and account settings</p>
+                </div>
+    <div class="content-section">
+        <div class="settings-form">
+            <h3 style="margin-bottom: 12px; color: var(--text-primary);">Account Settings</h3>
+            <div class="form-group">
+                <label>Email</label>
+                <input id="settingsEmail" type="email" placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+                <label>Phone</label>
+                <input id="settingsPhone" type="tel" placeholder="Your phone number">
+            </div>
+            <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border-color);">
+            
+            <h3 style="margin-bottom: 12px; color: var(--text-primary);">Appearance</h3>
+            <div class="form-group">
+                <label>Theme Mode</label>
+                <select id="themeMode">
+                    <option value="light">Light Mode</option>
+                    <option value="dark">Dark Mode</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Color Theme</label>
+                <select id="themeSelect">
+                    <option value="green">Green (Default)</option>
+                    <option value="antique white">antique white</option>
+                    <option value="white">white</option>
+                    <option value="blue">blue</option>
+                </select>
+            </div>
+            <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border-color);">
+
+            <h3 style="margin-bottom: 12px; color: var(--text-primary);">Notifications</h3>
+            <div class="form-group">
+                <input type="checkbox" id="emailNotifications" checked>
+                <label style="margin-left: 8px; display: inline;">Email Notifications</label>
+            </div>
+            <div class="form-group">
+                <input type="checkbox" id="pushNotifications" checked>
+                <label style="margin-left: 8px; display: inline;">Push Notifications</label>
+            </div>
+            <div class="form-group">
+                <input type="checkbox" id="eventNotifications" checked>
+                <label style="margin-left: 8px; display: inline;">Event Notifications</label>
+            </div>
+            <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border-color);">
+
+            <h3 style="margin-bottom: 12px; color: var(--text-primary);">Privacy</h3>
+            <div class="form-group">
+                <label>Profile Visibility</label>
+                <select id="profileVisibility">
+                    <option value="public">Public</option>
+                    <option value="friends">Friends Only</option>
+                    <option value="private">Private</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="checkbox" id="showOnlineStatus" checked>
+                <label style="margin-left: 8px; display: inline;">Show Online Status</label>
+            </div>
+            <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border-color);">
+
+            <button class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
+            <button class="btn btn-danger" id="changePasswordBtn" style="margin-left: 10px;">Change Password</button>
+        </div>
+    </div>
+</div>

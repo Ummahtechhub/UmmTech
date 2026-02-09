@@ -1,0 +1,45 @@
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null",
+    "uploads": {
+      "$type": {
+        "$itemId": {
+          ".read": "auth != null",
+          ".write": "auth != null",
+          ".validate": "newData.hasChildren(['fileName','fileURL','category','description','uploadedBy','uploadedAt','type'])",
+          "fileName": {
+            ".validate": "newData.isString() && newData.val().length <= 200"
+          },
+          "fileURL": {
+            ".validate": "newData.isString() && newData.val().length <= 1000"
+          },
+          "storagePath": {
+            ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 500)"
+          },
+          "category": {
+            ".validate": "newData.isString() && newData.val().length <= 50"
+          },
+          "description": {
+            ".validate": "newData.isString() && newData.val().length <= 2000"
+          },
+          "uploadedBy": {
+            ".validate": "newData.isString() && newData.val().length <= 200"
+          },
+          "uploadedAt": {
+            ".validate": "newData.isNumber()"
+          },
+          "type": {
+            ".validate": "newData.val() == 'images' || newData.val() == 'videos' || newData.val() == 'files'"
+          },
+          "compressedURL": {
+            ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 1000000)"
+          },
+          "thumbnailURL": {
+            ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 300000)"
+          }
+        }
+      }
+    }
+  }
+}

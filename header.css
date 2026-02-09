@@ -1,0 +1,84 @@
+/* Header Styles */
+header {
+    background: var(--bg-color);
+    backdrop-filter: blur(3px);
+    padding: 10px 20px;
+}
+
+.hamburger-btn {
+    position: absolute;
+    left: 20px;
+    background: none;
+    border: 1px solid rgba(46, 139, 87, 0.3);
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    padding: 4px;
+}
+
+.hamburger-btn:hover {
+    background: hwb(146 91% 7% / 0.89);
+}
+
+.hamburger-btn span {
+    width: 20px;
+    height: 2px;
+    background-color: var(--text-primary);
+    display: block;
+    transition: all 0.3s ease;
+    border-radius: 1px;
+}
+
+.hamburger-btn.active span:nth-child(1) {
+    transform: rotate(45deg) translateY(8px);
+}
+
+.hamburger-btn.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger-btn.active span:nth-child(3) {
+    transform: rotate(-45deg) translateY(-8px);
+}
+
+.brand {
+    font-size: 32px;
+    font-weight: 700;
+    color: green;
+    text-align: center;
+    flex: 1;
+    animation: fadeInUp 1s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header-right {
+    position: absolute;
+    right: 20px;
+}
+
+.user-name {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+img[alt="Ummah TechHub Logo"] {
+    height: 80px;
+    width: auto;
+}

@@ -1,0 +1,70 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    match /userProfiles/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    match /userSettings/{userId} {
+      allow read, write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    match /events/{docId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /projects/{docId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /teams/{docId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /images/{docId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /videos/{docId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /files/{docId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /posts/{docId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /settings/{docId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /media/{docId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /archivedProjects/{docId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /archivedEvents/{docId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /archivedTeams/{docId} {
+      allow read, write: if isSignedIn();
+    }
+  }
+}

@@ -1,0 +1,95 @@
+<link rel="stylesheet" href="general.css">
+<link rel="stylesheet" href="home.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="forms.css">
+<link rel="stylesheet" href="main-content.css">
+<link rel="stylesheet" href="responsive.css">
+<div class="content-page" data-page="teams">
+    
+    <div class="content-section team-spotlight-section" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); margin-bottom: 20px;">
+        <div class="team-spotlight-grid">
+            <div class="team-card team-spotlight-card">
+                <div class="team-spotlight-media">
+                    <img src="https://i.ibb.co/RTfQ4g3D/Whats-App-Image-2026-01-31-at-8-39-53-AM.jpg" alt="Team members standing together">
+                    <div class="team-spotlight-overlay">Builders of Vision</div>
+                </div>
+                <div class="team-spotlight-body">Focused teams shaping the hub's future.</div>
+            </div>
+            <div class="team-card team-spotlight-card">
+                <div class="team-spotlight-media">
+                    <img src="https://i.ibb.co/SXhmXGq0/Whats-App-Image-2026-01-31-at-8-39-50-AM-2.jpg" alt="Team collaboration moment">
+                    <div class="team-spotlight-overlay">United in Service</div>
+                </div>
+                <div class="team-spotlight-body">Collaboration, care, and steady impact.</div>
+            </div>
+            <div class="team-card team-spotlight-card">
+                <div class="team-spotlight-media">
+                    <img src="https://i.ibb.co/RG0jpxB6/0V6A9222.jpg" alt="Team portrait with confidence">
+                    <div class="team-spotlight-overlay">Innovation with Purpose</div>
+                </div>
+                <div class="team-spotlight-body">Ideas backed by action and excellence.</div>
+            </div>
+            <div class="team-card team-spotlight-card">
+                <div class="team-spotlight-media">
+                    <img src="https://i.ibb.co/2YkcgV8F/Whats-App-Image-2026-01-30-at-5-21-44-PM-1.jpg" alt="Team gathering moment">
+                    <div class="team-spotlight-overlay">Together We Build</div>
+                </div>
+                <div class="team-spotlight-body">Unity and focus across every team.</div>
+            </div>
+            <div class="team-card team-spotlight-card">
+                <div class="team-spotlight-media">
+                    <img src="https://i.ibb.co/fVf5713K/Whats-App-Image-2026-02-02-at-10-40-42-AM.jpg" alt="Team collaboration highlight">
+                    <div class="team-spotlight-overlay">Serve with Heart</div>
+                </div>
+                <div class="team-spotlight-body">Committed to impact and excellence.</div>
+            </div>
+            <div class="team-card team-spotlight-card">
+                <div class="team-spotlight-media">
+                    <img src="https://i.ibb.co/2Y5YYDKc/Whats-App-Image-2026-01-30-at-5-21-44-PM.jpg" alt="Team group portrait">
+                    <div class="team-spotlight-overlay">Strength in Unity</div>
+                </div>
+                <div class="team-spotlight-body">Focused minds, shared mission.</div>
+            </div>
+        </div>
+    </div>
+
+    <div style="background: #2e8b57; padding: 20px; text-align: center; margin-bottom: 20px; color: white;">
+        <h2 class="animated-title glow-title"><i class="fas fa-users"></i> Teams</h2>
+        <p>Stronger Together - Meet the teams Turning vision into reality</p>
+    </div>
+
+    <div class="content-section" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); margin-bottom: 20px; padding: 20px;">
+        <button class="btn btn-primary" id="addTeamBtn">+ Create Team</button>
+        <div id="teamCountInfo" style="margin-top: 10px; color: #2e8b57; font-weight: 500;">Teams created: <span id="teamCount">0</span>/4</div>
+
+        <!-- Create Team Form (hidden by default) -->
+        <div id="teamFormContainer" class="settings-form" style="display:none; margin-top: 20px; padding: 20px; background: rgba(46,139,87,0.1); border-radius: 8px;">
+            <h3>Create New Team</h3>
+            <div class="form-group">
+                <label>Team Name</label>
+                <input id="teamName" type="text" placeholder="e.g., Frontend Team">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="teamDesc" rows="3" placeholder="Team purpose and focus areas"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Team Lead</label>
+                <input id="teamLead" type="text" placeholder="Team lead name">
+            </div>
+            <div class="form-group">
+                <label>Members (comma separated)</label>
+                <input id="teamMembers" type="text" placeholder="e.g., John, Jane, Mike">
+            </div>
+            <button class="btn btn-primary" id="saveTeamBtn">Create Team</button>
+            <button class="btn btn-secondary" id="cancelTeamBtn" style="margin-left: 10px;">Cancel</button>
+        </div>
+    </div>
+
+    <div class="content-section" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);">
+        <h3 style="margin-bottom: 20px; color: var(--primary-color);">Your Teams</h3>
+        <div class="teams-grid" id="teamsGrid">
+            <!-- Teams will be loaded here from localStorage -->
+        </div>
+    </div>
+</div>
