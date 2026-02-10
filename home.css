@@ -532,6 +532,19 @@ body.sidebar-open {
     border-radius: 12px;
 }
 
+/* Fluid typography and spacing */
+body {
+    font-size: clamp(14px, 1.1vw, 16px);
+}
+
+.page-header h2 {
+    font-size: clamp(20px, 2.2vw, 28px);
+}
+
+.content-section {
+    padding: clamp(16px, 2.2vw, 28px);
+}
+
 .btn {
     padding: 10px 20px;
     border: none;
@@ -1056,6 +1069,8 @@ select {
     font-size: 13px;
     margin-top: 40px;
     border-radius: 0 0 12px 12px;
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
 }
 
 .dashboard-footer p {
@@ -1192,6 +1207,10 @@ body.dark-mode .stat-card:hover {
         margin-left: 0;
         margin-right: 0;
         padding: 20px;
+        width: 100%;
+    }
+    .dashboard-footer {
+        margin-left: 0;
         width: 100%;
     }
 
@@ -1367,6 +1386,13 @@ body.dark-mode .stat-card:hover {
     }
     50% {
         transform: translateY(-10px);
+    }
+}
+
+@media (max-width: 1200px) {
+    .dashboard-footer {
+        margin-left: 0;
+        width: 100%;
     }
 }
 

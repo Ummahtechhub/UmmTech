@@ -281,21 +281,21 @@ function initializeSidebar() {
 
     if (!hamburger || !sidebar) return;
 
-    if (window.innerWidth <= 768) {
+    if (window.innerWidth <= 1200) {
         sidebar.classList.add('hidden');
     }
 
     hamburger.addEventListener('click', () => {
         hamburger.classList.toggle('active');
         sidebar.classList.toggle('hidden');
-        if (window.innerWidth <= 768) {
+        if (window.innerWidth <= 1200) {
             document.body.classList.toggle('sidebar-open', !sidebar.classList.contains('hidden'));
         }
     });
 
     // Close sidebar on mobile when clicking outside
     document.addEventListener('click', (e) => {
-        if (window.innerWidth <= 768) {
+        if (window.innerWidth <= 1200) {
             if (!sidebar.contains(e.target) && !hamburger.contains(e.target)) {
                 hamburger.classList.remove('active');
                 sidebar.classList.add('hidden');

@@ -41,6 +41,41 @@ body {
     animation: whiteGlowPulse 3s ease-in-out infinite;
 }
 
+/* Consistent layout scaling */
+.dashboard-container {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+}
+
+.main-content {
+    max-width: 1200px;
+    margin-right: auto;
+}
+
+.content-section,
+.page-header,
+.repo-showcase {
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (max-width: 1440px) {
+    .dashboard-container {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 1200px) {
+    .main-content,
+    .content-section,
+    .page-header,
+    .repo-showcase {
+        max-width: 100%;
+    }
+}
+
 @keyframes whiteGlowPulse {
     0% {
         text-shadow: 0 0 6px rgba(255, 255, 255, 0.35);
