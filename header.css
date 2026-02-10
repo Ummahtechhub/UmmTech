@@ -111,18 +111,22 @@ img[alt="Ummah TechHub Logo"] {
 
 @media (max-width: 480px) {
     header {
-        flex-direction: column;
-        gap: 6px;
         padding: 12px 16px;
     }
 
     .hamburger-btn {
-        top: 12px;
-        transform: none;
+        left: 12px;
     }
 
     .header-right {
-        position: static;
-        transform: none;
+        right: 12px;
+    }
+
+    img[alt="Ummah TechHub Logo"] {
+        height: 64px;
+    }
+
+    .brand {
+        font-size: 24px;
     }
 }
