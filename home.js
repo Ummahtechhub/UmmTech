@@ -288,6 +288,9 @@ function initializeSidebar() {
     hamburger.addEventListener('click', () => {
         hamburger.classList.toggle('active');
         sidebar.classList.toggle('hidden');
+        if (window.innerWidth <= 768) {
+            document.body.classList.toggle('sidebar-open', !sidebar.classList.contains('hidden'));
+        }
     });
 
     // Close sidebar on mobile when clicking outside
@@ -296,6 +299,7 @@ function initializeSidebar() {
             if (!sidebar.contains(e.target) && !hamburger.contains(e.target)) {
                 hamburger.classList.remove('active');
                 sidebar.classList.add('hidden');
+                document.body.classList.remove('sidebar-open');
             }
         }
     });
@@ -1192,30 +1196,24 @@ function createRepositoryCard(item, kind) {
     const card = document.createElement('div');
     card.className = 'project-card';
 
-    const title = item.title || item.fileName || item.filename || 'Untitled';
     const description = item.description || item.story || 'No description provided.';
-    const category = item.category || 'General';
-    const dateText = item.uploadedAt?.seconds
-        ? new Date(item.uploadedAt.seconds * 1000).toLocaleDateString()
-        : (item.createdDate || '-');
     const fileURL = kind === 'video'
         ? (item.fileURL || item.url || '')
         : (item.compressedURL || item.fileURL || item.url || '');
-    const sizeText = item.size ? `${(item.size / 1024 / 1024).toFixed(2)} MB` : '';
     const thumbURL = item.thumbnailURL || item.thumbnail || item.compressedURL || '';
 
     let media = '';
     if (kind === 'video') {
         media = `
-            <div style="width: 100%; height: 180px; background: #000; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; ${thumbURL ? `background-image: url('${thumbURL}'); background-size: cover; background-position: center;` : ''}">
-                <i class="fas fa-play-circle" style="font-size: 46px; color: var(--primary-color); text-shadow: 0 6px 14px rgba(0,0,0,0.6);"></i>
+            <div style="width: 100%; height: 200px; background: #000; border-radius: 8px; overflow: hidden; margin-bottom: 12px; display: flex; align-items: center; justify-content: center;">
+                ${fileURL ? `<video src="${fileURL}" ${thumbURL ? `poster="${thumbURL}"` : ''} controls controlsList="nodownload noplaybackrate" preload="metadata" style="width: 100%; height: 100%; object-fit: contain; background: #000;"></video>` : `<i class="fas fa-play-circle" style="font-size: 46px; color: var(--primary-color); text-shadow: 0 6px 14px rgba(0,0,0,0.6);"></i>`}
             </div>
         `;
     } else if (kind === 'image') {
         const imageURL = item.compressedURL || item.fileURL || item.url || '';
         media = `
-            <div style="width: 100%; height: 180px; border-radius: 8px; overflow: hidden; margin-bottom: 12px; background: rgba(46, 139, 87, 0.08);">
-                ${imageURL ? `<img src="${imageURL}" alt="${title}" style="width: 100%; height: 100%; object-fit: cover;">` : `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;"><i class="fas fa-image" style="font-size: 42px; color: rgba(46, 139, 87, 0.6);"></i></div>`}
+            <div style="width: 100%; height: 200px; border-radius: 8px; overflow: hidden; margin-bottom: 12px; background: rgba(46, 139, 87, 0.08); display: flex; align-items: center; justify-content: center;">
+                ${imageURL ? `<img src="${imageURL}" alt="" style="width: 100%; height: 100%; object-fit: contain; background: #fff;">` : `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;"><i class="fas fa-image" style="font-size: 42px; color: rgba(46, 139, 87, 0.6);"></i></div>`}
             </div>
         `;
     } else {
@@ -1228,15 +1226,8 @@ function createRepositoryCard(item, kind) {
 
     card.innerHTML = `
         ${media}
-        <h3>${title}</h3>
         <p class="card-text">${description}</p>
-        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0;">
-            <span class="badge badge-green">${category}</span>
-            <span class="badge badge-blue">${kind === 'video' ? 'Video' : (kind === 'image' ? 'Image' : 'Document')}</span>
-            ${sizeText ? `<span class="badge badge-purple">${sizeText}</span>` : ''}
-        </div>
-        <p class="card-subtext" style="font-size: 12px;">${dateText}</p>
-        ${fileURL ? `<a class="btn btn-primary" href="${fileURL}" target="_blank" rel="noopener">Open</a>` : '<div style="color: var(--text-secondary); font-size: 12px;">Awaiting file link</div>'}
+        ${kind === 'file' && fileURL ? `<a class="btn btn-primary" href="${fileURL}" target="_blank" rel="noopener">Open</a>` : ''}
     `;
 
     return card;
@@ -1323,8 +1314,11 @@ function createFeedCard(item) {
     const card = document.createElement('div');
     card.style.cssText = 'background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; transition: all 0.3s ease;';
     
+    const itemKey = String(item.id || item.fileURL || item.url || item.thumbnail || item.title || item.fileName || item.filename || item.createdAt || item.uploadedAt?.seconds || Math.random());
+    const itemId = itemKey.replace(/[^a-zA-Z0-9_-]/g, '_');
     const titleText = item.title || item.fileName || item.filename || item.name || 'Post';
     const descriptionText = item.description || item.story || item.content || '';
+    const shortDesc = descriptionText || 'No description provided.';
     const createdDate = item.createdDate
         || (item.uploadedAt?.seconds ? new Date(item.uploadedAt.seconds * 1000).toLocaleDateString() : '');
 
@@ -1343,71 +1337,87 @@ function createFeedCard(item) {
             </div>
         `;
     } else if (item.type === 'video') {
-        const fileLabel = item.filename || item.fileName || item.title || 'Video';
-        const sizeLabel = item.size ? `${(item.size / 1024 / 1024).toFixed(2)} MB` : '';
-        const dateLabel = createdDate;
         const poster = item.thumbnailURL || item.thumbnail || item.compressedURL || '';
+        const videoUrl = item.fileURL || item.url || '';
         content = `
             <div style="padding: 20px;">
-                <h3 style="margin-bottom: 10px; color: var(--text-primary);">${titleText}</h3>
-                <div style="width: 100%; height: 250px; background: #000; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; ${poster ? `background-image: url('${poster}'); background-size: cover; background-position: center;` : ''}">
-                    <i class="fas fa-play-circle" style="font-size: 60px; color: var(--primary-color); text-shadow: 0 10px 18px rgba(0,0,0,0.7);"></i>
+                <div style="width: 100%; height: 260px; background: #000; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                    ${videoUrl ? `<video src="${videoUrl}" ${poster ? `poster="${poster}"` : ''} class="feed-media feed-media-video" controls controlsList="nodownload noplaybackrate" preload="metadata"></video>` : `<i class="fas fa-play-circle" style="font-size: 60px; color: var(--primary-color); text-shadow: 0 10px 18px rgba(0,0,0,0.7);"></i>`}
                 </div>
-                <p style="color: var(--text-secondary); margin-bottom: 15px;">${descriptionText}</p>
-                <small style="color: #999;">${fileLabel}${sizeLabel ? ` (${sizeLabel})` : ''}${dateLabel ? ` - ${dateLabel}` : ''}</small>
+                <p style="color: var(--text-secondary); margin-bottom: 0;">${shortDesc}</p>
             </div>
         `;
     } else if (item.type === 'image') {
         const imageUrl = item.compressedURL || item.fileURL || item.url || item.thumbnail || '';
         content = `
             <div>
-                <img src="${imageUrl}" class="feed-media feed-media-image" alt="${item.title || 'Image'}">
+                <img src="${imageUrl}" class="feed-media feed-media-image" alt="">
                 <div style="padding: 15px;">
-                    <h3 style="margin-bottom: 8px; color: var(--text-primary);">${titleText}</h3>
-                    <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 10px;">${descriptionText}</p>
-                    <small style="color: #999;">${createdDate}</small>
+                    <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 0;">${shortDesc}</p>
                 </div>
             </div>
         `;
     }
 
     // Create interactions section
-    const interactionsKey = `interactions_${item.id}`;
+    const interactionsKey = `interactions_${itemId}`;
     let interactions = JSON.parse(localStorage.getItem(interactionsKey) || '{"likes": 0, "shares": 0, "comments": []}');
 
     const likesCount = interactions.likes || 0;
     const sharesCount = interactions.shares || 0;
     const commentsCount = (interactions.comments?.length) || 0;
+    const shareText = encodeURIComponent(shortDesc || titleText || 'Check this out on Ummah TechHub');
+    const shareUrl = encodeURIComponent(window.location.href);
 
     card.innerHTML = `
         ${content}
         <div style="padding: 15px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; flex-wrap: wrap; gap: 10px;">
-            <button onclick="window.toggleLike(${item.id})" class="feed-action-btn" style="flex: 1; min-width: 80px; padding: 10px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 6px; transition: all 0.3s ease;">
+            <button onclick="window.toggleLike('${itemId}')" class="feed-action-btn" style="flex: 1; min-width: 80px; padding: 10px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 6px; transition: all 0.3s ease;">
                 <i class="fas fa-thumbs-up"></i>
-                <span>Like (<span class="like-count-${item.id}">${likesCount}</span>)</span>
+                <span>Like (<span class="like-count-${itemId}">${likesCount}</span>)</span>
             </button>
-            <button onclick="window.shareContent(${item.id}, '${item.type}')" class="feed-action-btn" style="flex: 1; min-width: 80px; padding: 10px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 6px; transition: all 0.3s ease;">
+            <button onclick="window.toggleShare('${itemId}')" class="feed-action-btn" style="flex: 1; min-width: 80px; padding: 10px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 6px; transition: all 0.3s ease;">
                 <i class="fas fa-share"></i>
-                <span>Share (<span class="share-count-${item.id}">${sharesCount}</span>)</span>
+                <span>Share (<span class="share-count-${itemId}">${sharesCount}</span>)</span>
             </button>
-            <button onclick="window.toggleComment(${item.id})" class="feed-action-btn" style="flex: 1; min-width: 80px; padding: 10px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 6px; transition: all 0.3s ease;">
+            <button onclick="window.toggleComment('${itemId}')" class="feed-action-btn" style="flex: 1; min-width: 80px; padding: 10px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 6px; transition: all 0.3s ease;">
                 <i class="fas fa-comment"></i>
-                <span>Comment (<span class="comment-count-${item.id}">${commentsCount}</span>)</span>
+                <span>Comment (<span class="comment-count-${itemId}">${commentsCount}</span>)</span>
             </button>
-            ${item.type !== 'post' ? `
-            <button onclick="window.downloadItem('${item.fileURL || item.url || item.thumbnail}', '${item.filename || item.fileName || item.title}')" class="feed-action-btn" style="flex: 1; min-width: 80px; padding: 10px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 6px; transition: all 0.3s ease;">
-                <i class="fas fa-download"></i>
-                <span>Download</span>
-            </button>
-            ` : ''}
         </div>
-        <div id="comments-${item.id}" style="display: none; padding: 15px; border-top: 1px solid var(--border-color); background: rgba(46, 139, 87, 0.05);">
-            <div id="comments-list-${item.id}" style="margin-bottom: 15px; max-height: 200px; overflow-y: auto;">
-                ${renderComments(item.id)}
+        <div id="share-${itemId}" style="display: none; padding: 12px 15px; border-top: 1px solid var(--border-color); background: rgba(46, 139, 87, 0.05);">
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <a href="https://www.facebook.com/sharer/sharer.php?u=${shareUrl}" target="_blank" rel="noopener" onclick="window.trackShare('${itemId}')" style="color: #1877f2; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fab fa-facebook"></i> Facebook
+                </a>
+                <a href="https://www.instagram.com/" target="_blank" rel="noopener" onclick="window.trackShare('${itemId}')" style="color: #dd2a7b; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fab fa-instagram"></i> Instagram
+                </a>
+                <a href="https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}" target="_blank" rel="noopener" onclick="window.trackShare('${itemId}')" style="color: #111; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fab fa-x-twitter"></i> X
+                </a>
+                <a href="https://wa.me/?text=${shareText}%20${shareUrl}" target="_blank" rel="noopener" onclick="window.trackShare('${itemId}')" style="color: #25d366; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </a>
+                <a href="https://t.me/share/url?url=${shareUrl}&text=${shareText}" target="_blank" rel="noopener" onclick="window.trackShare('${itemId}')" style="color: #229ed9; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fab fa-telegram"></i> Telegram
+                </a>
             </div>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <input type="text" placeholder="Add a comment..." id="comment-input-${item.id}" style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg); color: var(--text-primary);">
-                <button onclick="window.addComment(${item.id})" style="padding: 10px 20px; background: var(--primary-color); color: white; border: none; border-radius: 6px; cursor: pointer;">Post</button>
+        </div>
+        <div id="comments-${itemId}" style="display: none; padding: 15px; border-top: 1px solid var(--border-color); background: rgba(46, 139, 87, 0.05);">
+            <div id="comments-list-${itemId}" style="margin-bottom: 15px; max-height: 220px; overflow-y: auto;">
+                ${renderComments(itemId)}
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                <input type="text" placeholder="Add a comment..." id="comment-input-${itemId}" style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg); color: var(--text-primary);">
+                <button onclick="window.addComment('${itemId}')" style="padding: 10px 20px; background: var(--primary-color); color: white; border: none; border-radius: 6px; cursor: pointer;">Post</button>
+            </div>
+            <div style="margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap;">
+                <button onclick="window.insertEmoji('comment-input-${itemId}', '👍')" style="border: none; background: transparent; cursor: pointer;">👍</button>
+                <button onclick="window.insertEmoji('comment-input-${itemId}', '❤️')" style="border: none; background: transparent; cursor: pointer;">❤️</button>
+                <button onclick="window.insertEmoji('comment-input-${itemId}', '😂')" style="border: none; background: transparent; cursor: pointer;">😂</button>
+                <button onclick="window.insertEmoji('comment-input-${itemId}', '🎉')" style="border: none; background: transparent; cursor: pointer;">🎉</button>
+                <button onclick="window.insertEmoji('comment-input-${itemId}', '🙏')" style="border: none; background: transparent; cursor: pointer;">🙏</button>
             </div>
         </div>
     `;
@@ -1423,11 +1433,40 @@ function renderComments(itemId) {
         return '<p style="color: var(--text-secondary); font-size: 12px;">No comments yet</p>';
     }
 
+    const renderReplies = (comment) => {
+        if (!comment.replies || comment.replies.length === 0) return '';
+        return comment.replies.map(reply => `
+            <div style="margin-left: 22px; margin-top: 8px; padding: 8px; background: rgba(0,0,0,0.03); border-radius: 6px;">
+                <strong style="color: var(--text-primary); font-size: 12px;">${reply.author}</strong>
+                <p style="font-size: 12px; color: var(--text-secondary); margin: 4px 0;">${reply.text}</p>
+                <small style="color: #999; font-size: 11px;">${reply.date}</small>
+            </div>
+        `).join('');
+    };
+
     return interactions.comments.map(comment => `
         <div style="padding: 10px; background: var(--card-bg); border-radius: 6px; margin-bottom: 8px;">
             <strong style="color: var(--text-primary);">${comment.author}</strong>
             <p style="font-size: 13px; color: var(--text-secondary); margin: 5px 0;">${comment.text}</p>
-            <small style="color: #999;">${comment.date}</small>
+            <div style="display: flex; gap: 12px; align-items: center; font-size: 12px; color: #999;">
+                <span>${comment.date}</span>
+                <button onclick="window.likeComment('${itemId}', '${comment.id}')" style="border: none; background: transparent; cursor: pointer; color: #1877f2;">Like (${comment.likes || 0})</button>
+                <button onclick="window.toggleReply('${itemId}', '${comment.id}')" style="border: none; background: transparent; cursor: pointer; color: #2e8b57;">Reply</button>
+            </div>
+            <div id="reply-box-${itemId}-${comment.id}" style="display: none; margin-top: 8px;">
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <input type="text" id="reply-input-${itemId}-${comment.id}" placeholder="Write a reply..." style="flex: 1; min-width: 150px; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg); color: var(--text-primary);">
+                    <button onclick="window.addReply('${itemId}', '${comment.id}')" style="padding: 8px 14px; background: var(--primary-color); color: white; border: none; border-radius: 6px; cursor: pointer;">Reply</button>
+                </div>
+                <div style="margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap;">
+                    <button onclick="window.insertEmoji('reply-input-${itemId}-${comment.id}', '👍')" style="border: none; background: transparent; cursor: pointer;">👍</button>
+                    <button onclick="window.insertEmoji('reply-input-${itemId}-${comment.id}', '❤️')" style="border: none; background: transparent; cursor: pointer;">❤️</button>
+                    <button onclick="window.insertEmoji('reply-input-${itemId}-${comment.id}', '😂')" style="border: none; background: transparent; cursor: pointer;">😂</button>
+                    <button onclick="window.insertEmoji('reply-input-${itemId}-${comment.id}', '🎉')" style="border: none; background: transparent; cursor: pointer;">🎉</button>
+                    <button onclick="window.insertEmoji('reply-input-${itemId}-${comment.id}', '🙏')" style="border: none; background: transparent; cursor: pointer;">🙏</button>
+                </div>
+            </div>
+            ${renderReplies(comment)}
         </div>
     `).join('');
 }
@@ -1472,9 +1511,12 @@ window.addComment = function(itemId) {
     const author = userData.name || userData.email?.split('@')[0] || 'Anonymous';
     
     interactions.comments.push({
+        id: `c_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
         author,
         text,
-        date: new Date().toLocaleDateString()
+        date: new Date().toLocaleDateString(),
+        likes: 0,
+        replies: []
     });
 
     localStorage.setItem(interactionsKey, JSON.stringify(interactions));
@@ -1486,7 +1528,13 @@ window.addComment = function(itemId) {
     input.value = '';
 };
 
-window.shareContent = function(itemId, type) {
+window.toggleShare = function(itemId) {
+    const shareSection = document.getElementById(`share-${itemId}`);
+    if (!shareSection) return;
+    shareSection.style.display = shareSection.style.display === 'none' ? 'block' : 'none';
+};
+
+window.trackShare = function(itemId) {
     const interactionsKey = `interactions_${itemId}`;
     let interactions = JSON.parse(localStorage.getItem(interactionsKey) || '{"likes": 0, "shares": 0, "comments": []}');
     
@@ -1495,26 +1543,56 @@ window.shareContent = function(itemId, type) {
     
     const shareCountEl = document.querySelector(`.share-count-${itemId}`);
     if (shareCountEl) shareCountEl.textContent = interactions.shares;
-    
-    // Try native share
-    if (navigator.share) {
-        navigator.share({
-            title: 'Check this out!',
-            text: 'I found something interesting on Ummah TechHub',
-            url: window.location.href
-        }).catch(() => {});
-    } else {
-        alert('Shared! Share count: ' + interactions.shares);
-    }
 };
 
-window.downloadItem = function(url, filename) {
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename || 'download';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+window.likeComment = function(itemId, commentId) {
+    const interactionsKey = `interactions_${itemId}`;
+    let interactions = JSON.parse(localStorage.getItem(interactionsKey) || '{"likes": 0, "shares": 0, "comments": []}');
+    const comment = interactions.comments?.find(c => c.id === commentId);
+    if (!comment) return;
+    comment.likes = (comment.likes || 0) + 1;
+    localStorage.setItem(interactionsKey, JSON.stringify(interactions));
+    document.getElementById(`comments-list-${itemId}`).innerHTML = renderComments(itemId);
+};
+
+window.toggleReply = function(itemId, commentId) {
+    const box = document.getElementById(`reply-box-${itemId}-${commentId}`);
+    if (!box) return;
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    const input = document.getElementById(`reply-input-${itemId}-${commentId}`);
+    if (input && box.style.display === 'block') input.focus();
+};
+
+window.addReply = function(itemId, commentId) {
+    const input = document.getElementById(`reply-input-${itemId}-${commentId}`);
+    if (!input) return;
+    const text = input.value.trim();
+    if (!text) {
+        alert('Please write a reply');
+        return;
+    }
+    const interactionsKey = `interactions_${itemId}`;
+    let interactions = JSON.parse(localStorage.getItem(interactionsKey) || '{"likes": 0, "shares": 0, "comments": []}');
+    const comment = interactions.comments?.find(c => c.id === commentId);
+    if (!comment) return;
+    const userData = JSON.parse(localStorage.getItem('ummah_user') || '{}');
+    const author = userData.name || userData.email?.split('@')[0] || 'Anonymous';
+    if (!comment.replies) comment.replies = [];
+    comment.replies.push({
+        author,
+        text,
+        date: new Date().toLocaleDateString()
+    });
+    localStorage.setItem(interactionsKey, JSON.stringify(interactions));
+    document.getElementById(`comments-list-${itemId}`).innerHTML = renderComments(itemId);
+    input.value = '';
+};
+
+window.insertEmoji = function(inputId, emoji) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    input.value = `${input.value}${emoji}`;
+    input.focus();
 };
 
 // Handle responsive design

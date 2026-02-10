@@ -64,6 +64,59 @@ body {
     animation: none;
 }
 
+/* Colorful header icons */
+.page-header h1 i,
+.page-header h2 i,
+.page-header h3 i,
+h1.glow-title i,
+h2.glow-title i,
+h3.glow-title i,
+h1.animated-title i,
+h2.animated-title i,
+h3.animated-title i,
+.content-section h1 i,
+.content-section h2 i,
+.content-section h3 i,
+.repo-showcase h1 i,
+.repo-showcase h2 i,
+.repo-showcase h3 i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    margin-right: 8px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f58529, #dd2a7b, #8134af);
+    color: #ffffff;
+    font-size: 16px;
+    box-shadow: 0 6px 16px rgba(221, 42, 123, 0.35);
+    vertical-align: middle;
+}
+
+@media (max-width: 480px) {
+    .page-header h1 i,
+    .page-header h2 i,
+    .page-header h3 i,
+    h1.glow-title i,
+    h2.glow-title i,
+    h3.glow-title i,
+    h1.animated-title i,
+    h2.animated-title i,
+    h3.animated-title i,
+    .content-section h1 i,
+    .content-section h2 i,
+    .content-section h3 i,
+    .repo-showcase h1 i,
+    .repo-showcase h2 i,
+    .repo-showcase h3 i {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+        margin-right: 6px;
+    }
+}
+
 /* Force Antique White backgrounds globally (footer stays dark via its own styles) */
 .dashboard-container,
 .main-content,

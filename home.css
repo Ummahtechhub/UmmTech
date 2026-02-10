@@ -40,6 +40,10 @@ body {
     animation: whiteGlowPulse 3s ease-in-out infinite;
 }
 
+body.sidebar-open {
+    overflow: hidden;
+}
+
 @keyframes whiteGlowPulse {
     0% {
         text-shadow: 0 0 6px rgba(255, 255, 255, 0.35);
@@ -1681,13 +1685,17 @@ body.theme-dark .nav-btn:hover {
 /* Feed Media */
 .feed-media {
     width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 9;
-    object-fit: cover;
+    height: 260px;
+    object-fit: contain;
     display: block;
     background: rgba(0, 0, 0, 0.04);
 }
 
 .feed-media-image {
-    max-height: 360px;
+    max-height: 260px;
+    background: #ffffff;
+}
+
+.feed-media-video {
+    background: #000000;
 }

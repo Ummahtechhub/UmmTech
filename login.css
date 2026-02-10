@@ -44,16 +44,16 @@ img {
     border-radius: 16px;
     width: 100%;
     max-width: 420px;
-    padding: 2.5rem;
+    padding: 1.5rem;
     text-align: center;
     box-shadow: var(--shadow-lg);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(9px);
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 h2 {
     color: var(--primary-color);
-    margin-bottom: 10px;
+    margin-bottom: 7px;
     font-size: 24px;
     font-weight: 600;
 }
@@ -61,13 +61,13 @@ h2 {
 .auth p {
     color: var(--text-secondary);
     font-size: 14px;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .input {
     background: linear-gradient(135deg, rgba(46, 139, 87, 0.05), rgba(102, 205, 170, 0.03));
-    margin: 12px 0;
-    padding: 12px 14px;
+    margin: 9px 0;
+    padding: 10px 14px;
     border-radius: 8px;
     border: 2px solid rgba(46, 139, 87, 0.2);
     width: 100%;
@@ -96,9 +96,31 @@ label {
     margin-bottom: 5px;
 }
 
+.remember-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 6px 0 0;
+}
+
+.remember-row label {
+    margin: 0;
+    display: inline;
+}
+
+.remember-row input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary-color);
+}
+
 .input-type {
     position: relative;
     margin: 15px 0;
+}
+
+.input-type .input {
+    padding-right: 44px;
 }
 
 .input-type i {
