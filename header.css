@@ -93,6 +93,13 @@ img[alt="Ummah TechHub Logo"] {
     width: auto;
 }
 
+header > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
 @media (max-width: 480px) {
     header {
         padding: 12px 16px;

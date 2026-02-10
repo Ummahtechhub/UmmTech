@@ -1239,14 +1239,14 @@ function createRepositoryCard(item, kind) {
     if (kind === 'video') {
         media = `
             <div style="width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 8px; overflow: hidden; margin-bottom: 12px; display: flex; align-items: center; justify-content: center;">
-                ${fileURL ? `<video src="${fileURL}" ${thumbURL ? `poster="${thumbURL}"` : ''} controls controlsList="nodownload noplaybackrate" preload="metadata" style="width: 100%; height: 100%; object-fit: cover; background: #000;"></video>` : `<i class="fas fa-play-circle" style="font-size: 46px; color: var(--primary-color); text-shadow: 0 6px 14px rgba(0,0,0,0.6);"></i>`}
+                ${fileURL ? `<video src="${fileURL}" ${thumbURL ? `poster="${thumbURL}"` : ''} controls controlsList="nodownload noplaybackrate" preload="metadata" style="width: 100%; height: 100%; object-fit: contain; background: #000;"></video>` : `<i class="fas fa-play-circle" style="font-size: 46px; color: var(--primary-color); text-shadow: 0 6px 14px rgba(0,0,0,0.6);"></i>`}
             </div>
         `;
     } else if (kind === 'image') {
         const imageURL = item.compressedURL || item.fileURL || item.url || '';
         media = `
             <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; margin-bottom: 12px; background: rgba(46, 139, 87, 0.08); display: flex; align-items: center; justify-content: center;">
-                ${imageURL ? `<img src="${imageURL}" alt="" style="width: 100%; height: 100%; object-fit: cover; background: #fff;">` : `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;"><i class="fas fa-image" style="font-size: 42px; color: rgba(46, 139, 87, 0.6);"></i></div>`}
+                ${imageURL ? `<img src="${imageURL}" alt="" style="width: 100%; height: 100%; object-fit: contain; background: #fff;">` : `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;"><i class="fas fa-image" style="font-size: 42px; color: rgba(46, 139, 87, 0.6);"></i></div>`}
             </div>
         `;
     } else {
