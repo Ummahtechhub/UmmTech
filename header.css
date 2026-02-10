@@ -2,18 +2,17 @@
 header {
     background: var(--bg-color);
     backdrop-filter: blur(3px);
-    padding: 10px 72px;
+    padding: 10px 16px;
     position: relative;
-    display: flex;
+    display: grid;
+    grid-template-columns: 44px 1fr 44px;
     align-items: center;
     justify-content: center;
 }
 
 .hamburger-btn {
-    position: absolute;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%);
+    position: static;
+    transform: none;
     z-index: 15;
     background: none;
     border: 1px solid rgba(46, 139, 87, 0.3);
@@ -76,10 +75,9 @@ header {
 }
 
 .header-right {
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
+    position: static;
+    transform: none;
+    justify-self: end;
 }
 
 .user-name {
@@ -99,25 +97,13 @@ img[alt="Ummah TechHub Logo"] {
     align-items: center;
     gap: 4px;
     text-align: center;
-}
-
-@media (max-width: 768px) {
-    header {
-        padding: 12px 56px;
-    }
+    justify-self: center;
 }
 
 @media (max-width: 480px) {
     header {
-        padding: 12px 48px;
-    }
-
-    .hamburger-btn {
-        left: 12px;
-    }
-
-    .header-right {
-        right: 12px;
+        padding: 12px 12px;
+        grid-template-columns: 36px 1fr 36px;
     }
 
     img[alt="Ummah TechHub Logo"] {
