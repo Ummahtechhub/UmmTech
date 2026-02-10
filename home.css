@@ -1839,3 +1839,16 @@ body.theme-dark .nav-btn:hover {
 .feed-media-video {
     background: #000000;
 }
+#feedContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+@media (min-width: 1280px) {
+    #feedContainer {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 20px;
+    }
+}

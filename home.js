@@ -1507,8 +1507,11 @@ function renderComments(itemId) {
 window.toggleLike = function(itemId) {
     const interactionsKey = `interactions_${itemId}`;
     let interactions = JSON.parse(localStorage.getItem(interactionsKey) || '{"likes": 0, "shares": 0, "comments": []}');
-    
+    if (interactions.liked) {
+        return;
+    }
     interactions.likes = (interactions.likes || 0) + 1;
+    interactions.liked = true;
     localStorage.setItem(interactionsKey, JSON.stringify(interactions));
     
     const likeCountEl = document.querySelector(`.like-count-${itemId}`);
