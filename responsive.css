@@ -286,7 +286,7 @@
         transform: translateX(0);
     }
 
-    .hamburger-btn {
+    .dashboard-header .hamburger-btn {
         display: flex;
         position: fixed;
         top: 12px;
