@@ -37,6 +37,9 @@ if (hamburgerToggle && mainContent) {
     hamburgerToggle.addEventListener("click", () => {
         mainContent.classList.toggle("hidden");
         hamburgerToggle.classList.toggle("active");
+        if (window.innerWidth <= 1200) {
+            document.body.classList.toggle("sidebar-open", !mainContent.classList.contains("hidden"));
+        }
     });
 }
 
@@ -66,9 +69,10 @@ function showPage(pageId) {
         targetPage.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
-    if (window.innerWidth <= 768 && mainContent) {
+    if (window.innerWidth <= 1200 && mainContent) {
         mainContent.classList.add("hidden");
         if (hamburgerToggle) hamburgerToggle.classList.remove("active");
+        document.body.classList.remove("sidebar-open");
     }
 
     if (pageId === "manage-content") {
@@ -89,6 +93,12 @@ document.addEventListener("click", (e) => {
 
 document.querySelectorAll(".logout-btn").forEach((btn) => {
     btn.addEventListener("click", logout);
+});
+
+window.addEventListener("resize", () => {
+    if (window.innerWidth > 1200) {
+        document.body.classList.remove("sidebar-open");
+    }
 });
 
 const MAX_UPLOAD_BYTES = 1 * 1024 * 1024;
@@ -597,11 +607,16 @@ async function loadContent() {
     const allContent = [];
 
     try {
-        const collections = ["images", "videos", "files", "settings"];
+        const collections = ["images", "videos", "files", "posts", "events", "projects", "teams", "settings"];
         for (const collectionName of collections) {
-            const q = collectionName === "settings"
-                ? query(collection(db, collectionName), orderBy("updatedAt", "desc"))
-                : query(collection(db, collectionName), orderBy("uploadedAt", "desc"));
+            let q;
+            if (collectionName === "settings") {
+                q = query(collection(db, collectionName), orderBy("updatedAt", "desc"));
+            } else if (collectionName === "events" || collectionName === "projects" || collectionName === "teams") {
+                q = query(collection(db, collectionName), orderBy("createdAt", "desc"));
+            } else {
+                q = query(collection(db, collectionName), orderBy("uploadedAt", "desc"));
+            }
             const querySnapshot = await getDocs(q);
             querySnapshot.forEach((docSnap) => {
                 const data = docSnap.data();
@@ -675,12 +690,14 @@ function createContentItem(item) {
     }
 
     const title = item.title || item.fileName || item.name || (item.collection || item.type || "Content");
-    const description = item.description || item.desc || "No description";
+    const description = item.description || item.desc || item.story || "No description";
     const dateText = item.uploadedAt?.seconds
         ? new Date(item.uploadedAt.seconds * 1000).toLocaleDateString()
         : item.updatedAt?.seconds
             ? new Date(item.updatedAt.seconds * 1000).toLocaleDateString()
-            : (item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "-");
+            : item.createdAt?.seconds
+                ? new Date(item.createdAt.seconds * 1000).toLocaleDateString()
+                : (item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "-");
     const sourceBadge = item.source === "local" ? "Local" : (item.source === "realtime" ? "Realtime DB" : "Firestore");
     const typeBadge = item.collection || item.type || "content";
 

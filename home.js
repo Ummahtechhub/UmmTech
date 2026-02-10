@@ -174,6 +174,7 @@ async function migrateLocalStorageToFirestore() {
             description: project.desc || project.description || '',
             status: project.status || 'Active',
             progress: parseInt(project.progress || 0, 10),
+            type: project.type || 'Individual',
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp()
         }));
@@ -731,6 +732,7 @@ function initializeProjectForm() {
     const projectFormContainer = document.getElementById('projectFormContainer');
     const saveProjectBtn = document.getElementById('saveProjectBtn');
     const cancelProjectBtn = document.getElementById('cancelProjectBtn');
+    const projectTabs = document.querySelectorAll('.project-tab');
 
     if (!addProjectBtn) return;
 
@@ -744,6 +746,8 @@ function initializeProjectForm() {
             document.getElementById('projectName').value = '';
             document.getElementById('projectDesc').value = '';
             document.getElementById('projectProgress').value = '';
+            const projectType = document.getElementById('projectType');
+            if (projectType) projectType.value = 'Individual';
         });
     }
 
@@ -753,6 +757,7 @@ function initializeProjectForm() {
             const desc = document.getElementById('projectDesc').value;
             const status = document.getElementById('projectStatus').value;
             const progress = document.getElementById('projectProgress').value;
+            const type = document.getElementById('projectType')?.value || 'Individual';
 
             if (!name.trim()) {
                 alert('Please enter project name');
@@ -771,6 +776,7 @@ function initializeProjectForm() {
                     description: desc,
                     status: status,
                     progress: parseInt(progress || 0, 10),
+                    type: type,
                     createdAt: serverTimestamp(),
                     updatedAt: serverTimestamp()
                 });
@@ -780,6 +786,8 @@ function initializeProjectForm() {
                 document.getElementById('projectName').value = '';
                 document.getElementById('projectDesc').value = '';
                 document.getElementById('projectProgress').value = '';
+                const projectType = document.getElementById('projectType');
+                if (projectType) projectType.value = 'Individual';
                 displayProjects(docRef.id);
                 updateStats();
             } catch (e) {
@@ -787,7 +795,17 @@ function initializeProjectForm() {
             }
         });
     }
-    
+
+    if (projectTabs.length) {
+        projectTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                projectTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                displayProjects();
+            });
+        });
+    }
+
     displayProjects();
 }
 
@@ -802,12 +820,19 @@ async function displayProjects(highlightId) {
         const snapshot = await getDocs(projectsQuery);
         const projects = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
-        if (projects.length === 0) {
+        const activeTab = document.querySelector('.project-tab.active');
+        const filter = activeTab?.getAttribute('data-filter') || 'individual';
+        const filteredProjects = projects.filter(project => {
+            const type = (project.type || 'Individual').toLowerCase();
+            return filter === 'team' ? type === 'team' : type === 'individual';
+        });
+
+        if (filteredProjects.length === 0) {
             projectsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 40px;">No projects yet. Create your first project!</p>';
             return;
         }
 
-        projects.forEach(project => {
+        filteredProjects.forEach(project => {
             const projectCard = document.createElement('div');
             projectCard.className = 'project-card';
             if (highlightId && project.id === highlightId) {
