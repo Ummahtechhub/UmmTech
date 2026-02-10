@@ -1227,7 +1227,7 @@ async function loadRepositoryHighlights() {
 
 function createRepositoryCard(item, kind) {
     const card = document.createElement('div');
-    card.className = 'project-card';
+    card.className = 'project-card upload-card';
 
     const description = item.description || item.story || 'No description provided.';
     const fileURL = kind === 'video'
@@ -1238,21 +1238,21 @@ function createRepositoryCard(item, kind) {
     let media = '';
     if (kind === 'video') {
         media = `
-            <div style="width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 8px; overflow: hidden; margin-bottom: 12px; display: flex; align-items: center; justify-content: center;">
-                ${fileURL ? `<video src="${fileURL}" ${thumbURL ? `poster="${thumbURL}"` : ''} controls controlsList="nodownload noplaybackrate" preload="metadata" style="width: 100%; height: 100%; object-fit: contain; background: #000;"></video>` : `<i class="fas fa-play-circle" style="font-size: 46px; color: var(--primary-color); text-shadow: 0 6px 14px rgba(0,0,0,0.6);"></i>`}
+            <div class="upload-media upload-media-video">
+                ${fileURL ? `<video src="${fileURL}" ${thumbURL ? `poster="${thumbURL}"` : ''} controls controlsList="nodownload noplaybackrate" preload="metadata" class="upload-media-el"></video>` : `<i class="fas fa-play-circle upload-media-icon"></i>`}
             </div>
         `;
     } else if (kind === 'image') {
         const imageURL = item.compressedURL || item.fileURL || item.url || '';
         media = `
-            <div style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; margin-bottom: 12px; background: rgba(46, 139, 87, 0.08); display: flex; align-items: center; justify-content: center;">
-                ${imageURL ? `<img src="${imageURL}" alt="" style="width: 100%; height: 100%; object-fit: contain; background: #fff;">` : `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;"><i class="fas fa-image" style="font-size: 42px; color: rgba(46, 139, 87, 0.6);"></i></div>`}
+            <div class="upload-media upload-media-image">
+                ${imageURL ? `<img src="${imageURL}" alt="" class="upload-media-el">` : `<div class="upload-media-placeholder"><i class="fas fa-image upload-media-icon"></i></div>`}
             </div>
         `;
     } else {
         media = `
-            <div style="width: 100%; height: 180px; background: rgba(46, 139, 87, 0.08); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
-                <i class="fas fa-file-alt" style="font-size: 42px; color: rgba(46, 139, 87, 0.6);"></i>
+            <div class="upload-media upload-media-file">
+                <i class="fas fa-file-alt upload-media-icon"></i>
             </div>
         `;
     }
