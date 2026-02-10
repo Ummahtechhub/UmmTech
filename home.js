@@ -44,13 +44,6 @@ function initDashboard() {
 
     if (userDisplayName) userDisplayName.textContent = displayName.split(' ')[0];
     if (userWelcomeName) userWelcomeName.textContent = displayName.split(' ')[0];
-    const userAvatar = document.getElementById('userAvatar');
-    if (userAvatar) {
-        const avatarUrl = profile.profileImage || '';
-        if (avatarUrl) {
-            userAvatar.style.backgroundImage = `url(${avatarUrl})`;
-        }
-    }
 
     // Populate profile form
     const profileName = document.getElementById('profileName');
