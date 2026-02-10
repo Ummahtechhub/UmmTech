@@ -99,10 +99,9 @@ label {
 .remember-row {
     display: flex;
     align-items: center;
-    text-align: center;
-    justify-content: center;
-    gap: 8px;
-    margin: 6px 0 0;
+    justify-content: center; /* center the checkbox and label horizontally */
+    gap: 8px;                 /* space between checkbox and label */
+    margin: 10px 0;           /* vertical spacing from other elements */
 }
 
 .remember-row label {
