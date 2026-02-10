@@ -18,26 +18,26 @@
         row-gap: 6px;
     }
 
-    .header-left,
-    .header-right {
+    .dashboard-header .header-left,
+    .dashboard-header .header-right {
         flex: 1 1 100%;
         width: 100%;
         justify-content: space-between;
     }
 
-    .header-right {
+    .dashboard-header .header-right {
         gap: 10px;
         flex-wrap: wrap;
         justify-content: center;
     }
 
-    .header-center {
+    .dashboard-header .header-center {
         order: 3;
         width: 100%;
         min-width: 0;
     }
 
-    .header-center h1 {
+    .dashboard-header .header-center h1 {
         font-size: 24px;
         line-height: 1.2;
         word-break: break-word;
@@ -73,7 +73,7 @@
         transform: translateX(0);
     }
 
-    .hamburger-btn {
+    .dashboard-header .hamburger-btn {
         display: flex;
         position: fixed;
         top: 12px;
@@ -81,13 +81,13 @@
         z-index: 1200;
     }
 
-    .header-right {
+    .dashboard-header .header-right {
         position: static !important;
         right: auto;
         margin-top: 6px;
     }
 
-    .header-right .btn {
+    .dashboard-header .header-right .btn {
         padding: 8px 12px;
         font-size: 16px;
     }
@@ -144,16 +144,11 @@
         font-size: 16px; /* Prevent zoom on iOS */
     }
 
-    header {
-        padding: 12px;
-        text-align: center;
-    }
-
-    .brand {
+    .site-header .brand {
         font-size: 22px;
     }
 
-    img[alt="Ummah TechHub Logo"] {
+    .site-header img[alt="Ummah TechHub Logo"] {
         height: 60px;
         position: static !important;
     }
@@ -188,7 +183,7 @@
 }
 
 @media (max-width: 1024px) {
-    .hamburger-btn {
+    .dashboard-header .hamburger-btn {
         display: flex !important;
         position: fixed;
         top: 12px;
@@ -229,27 +224,23 @@
 }
 
 @media (min-width: 481px) and (max-width: 767px) {
-    header {
-        padding: 10px;
-    }
-
-    .brand {
+    .site-header .brand {
         font-size: 20px;
     }
 
-    .header-center h1 {
+    .dashboard-header .header-center h1 {
         font-size: 22px;
     }
 
-    .header-right .logout-btn span {
+    .dashboard-header .header-right .logout-btn span {
         display: none;
     }
 
-    .header-right .logout-btn {
+    .dashboard-header .header-right .logout-btn {
         padding: 8px 10px;
     }
 
-    .header-right .logout-btn i {
+    .dashboard-header .header-right .logout-btn i {
         font-size: 16px;
         margin: 0;
     }

@@ -1,5 +1,5 @@
 /* Header Styles */
-header {
+.site-header {
     background: var(--bg-color);
     backdrop-filter: blur(3px);
     padding: 10px 16px;
@@ -10,7 +10,7 @@ header {
     justify-content: center;
 }
 
-.hamburger-btn {
+.site-header .hamburger-btn {
     position: static;
     transform: none;
     z-index: 15;
@@ -55,7 +55,7 @@ header {
     transform: rotate(-45deg) translateY(-8px);
 }
 
-.brand {
+.site-header .brand {
     font-size: 32px;
     font-weight: 700;
     color: green;
@@ -75,7 +75,7 @@ header {
     }
 }
 
-.header-right {
+.site-header .header-right {
     position: static;
     transform: none;
     justify-self: end;
@@ -83,18 +83,18 @@ header {
     align-items: center;
 }
 
-.user-name {
+.site-header .user-name {
     font-size: 14px;
     color: var(--text-secondary);
     text-align: center;
 }
 
-img[alt="Ummah TechHub Logo"] {
+.site-header img[alt="Ummah TechHub Logo"] {
     height: 80px;
     width: auto;
 }
 
-.header-center-stack {
+.site-header .header-center-stack {
     display: flex;
     flex-direction: column;
     align-items: center;
