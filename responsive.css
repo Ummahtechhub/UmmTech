@@ -13,32 +13,34 @@
 
     .dashboard-header {
         height: auto;
-        padding: 12px 14px;
-        flex-wrap: wrap;
-        row-gap: 6px;
+        padding: 8px 12px;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        column-gap: 8px;
     }
 
     .dashboard-header .header-left,
     .dashboard-header .header-right {
-        flex: 1 1 100%;
-        width: 100%;
-        justify-content: space-between;
+        width: auto;
+        flex: 0 0 auto;
     }
 
     .dashboard-header .header-right {
-        gap: 10px;
-        flex-wrap: wrap;
-        justify-content: center;
+        gap: 6px;
+        justify-self: end;
     }
 
     .dashboard-header .header-center {
-        order: 3;
-        width: 100%;
         min-width: 0;
+        justify-self: center;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
     .dashboard-header .header-center h1 {
-        font-size: 24px;
+        font-size: 18px;
         line-height: 1.2;
         word-break: break-word;
     }
@@ -75,25 +77,34 @@
 
     .dashboard-header .hamburger-btn {
         display: flex;
-        position: fixed;
-        top: 12px;
-        left: 12px;
-        z-index: 1200;
+        position: static;
+        top: auto;
+        left: auto;
+        z-index: 1;
     }
 
     .dashboard-header .header-right {
         position: static !important;
         right: auto;
-        margin-top: 6px;
+        margin-top: 0;
     }
 
     .dashboard-header .header-right .btn {
-        padding: 8px 12px;
-        font-size: 16px;
+        padding: 6px 8px;
+        font-size: 14px;
+    }
+
+    .dashboard-header .header-right .logout-btn span {
+        display: none;
+    }
+
+    .dashboard-header .admin-logo {
+        width: 32px;
+        height: 32px;
     }
 
     .user-name {
-        font-size: 16px;
+        font-size: 14px;
     }
 
     .stats-grid {
@@ -228,6 +239,34 @@
         font-size: 20px;
     }
 
+    .dashboard-header {
+        height: auto;
+        padding: 10px 14px;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        column-gap: 10px;
+    }
+
+    .dashboard-header .header-left,
+    .dashboard-header .header-right {
+        width: auto;
+        flex: 0 0 auto;
+    }
+
+    .dashboard-header .header-right {
+        justify-self: end;
+        gap: 8px;
+    }
+
+    .dashboard-header .header-center {
+        justify-self: center;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
     .dashboard-header .header-center h1 {
         font-size: 22px;
     }
@@ -243,6 +282,17 @@
     .dashboard-header .header-right .logout-btn i {
         font-size: 16px;
         margin: 0;
+    }
+
+    .dashboard-header .hamburger-btn {
+        position: static;
+        top: auto;
+        left: auto;
+    }
+
+    .dashboard-header .admin-logo {
+        width: 36px;
+        height: 36px;
     }
 
     .content-page > div[style*="height: 400px"] {
