@@ -37,7 +37,7 @@ if (hamburgerToggle && mainContent) {
     hamburgerToggle.addEventListener("click", () => {
         mainContent.classList.toggle("hidden");
         hamburgerToggle.classList.toggle("active");
-        if (window.innerWidth <= 1200) {
+        if (window.innerWidth <= 1024) {
             document.body.classList.toggle("sidebar-open", !mainContent.classList.contains("hidden"));
         }
     });
@@ -69,7 +69,7 @@ function showPage(pageId) {
         targetPage.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
-    if (window.innerWidth <= 1200 && mainContent) {
+    if (window.innerWidth <= 1024 && mainContent) {
         mainContent.classList.add("hidden");
         if (hamburgerToggle) hamburgerToggle.classList.remove("active");
         document.body.classList.remove("sidebar-open");
@@ -96,7 +96,7 @@ document.querySelectorAll(".logout-btn").forEach((btn) => {
 });
 
 window.addEventListener("resize", () => {
-    if (window.innerWidth > 1200) {
+    if (window.innerWidth > 1024) {
         document.body.classList.remove("sidebar-open");
     }
 });

@@ -283,10 +283,10 @@ function initializeSidebar() {
     if (!hamburger || !sidebar) return;
 
     const setSidebarLock = () => {
-        document.body.classList.toggle('sidebar-open', !sidebar.classList.contains('hidden') && window.innerWidth <= 1200);
+        document.body.classList.toggle('sidebar-open', !sidebar.classList.contains('hidden') && window.innerWidth <= 1024);
     };
 
-    if (window.innerWidth <= 1200) {
+    if (window.innerWidth <= 1024) {
         sidebar.classList.add('hidden');
     }
     setSidebarLock();
@@ -299,7 +299,7 @@ function initializeSidebar() {
 
     // Close sidebar on mobile when clicking outside
     document.addEventListener('click', (e) => {
-        if (window.innerWidth <= 1200) {
+        if (window.innerWidth <= 1024) {
             if (!sidebar.contains(e.target) && !hamburger.contains(e.target)) {
                 hamburger.classList.remove('active');
                 sidebar.classList.add('hidden');
@@ -365,7 +365,7 @@ function initializeNavigation() {
             }
 
             // Close sidebar on mobile
-            if (window.innerWidth <= 1200) {
+            if (window.innerWidth <= 1024) {
                 const sidebar = document.getElementById('sidebar');
                 const hamburger = document.getElementById('hamburgerToggle');
                 if (sidebar) sidebar.classList.add('hidden');
@@ -434,7 +434,7 @@ function initializeQuickAccess() {
             targetNavBtn.click();
 
             // Close sidebar on mobile
-            if (window.innerWidth <= 1200) {
+            if (window.innerWidth <= 1024) {
                 const sidebar = document.getElementById('sidebar');
                 const hamburger = document.getElementById('hamburgerToggle');
                 if (sidebar) sidebar.classList.add('hidden');
@@ -662,7 +662,7 @@ window.addEventListener('resize', () => {
     const sidebar = document.getElementById('sidebar');
     const hamburger = document.getElementById('hamburgerToggle');
     
-    if (window.innerWidth > 1200) {
+    if (window.innerWidth > 1024) {
         if (sidebar) sidebar.classList.remove('hidden');
         if (hamburger) hamburger.classList.remove('active');
         document.body.classList.remove('sidebar-open');

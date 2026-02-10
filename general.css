@@ -67,7 +67,7 @@ body {
     }
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1280px) {
     .main-content,
     .content-section,
     .page-header,
