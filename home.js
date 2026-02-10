@@ -289,6 +289,7 @@ function initializeSidebar() {
     if (window.innerWidth <= 1200) {
         sidebar.classList.add('hidden');
     }
+    setSidebarLock();
 
     hamburger.addEventListener('click', () => {
         hamburger.classList.toggle('active');
@@ -665,6 +666,8 @@ window.addEventListener('resize', () => {
         if (sidebar) sidebar.classList.remove('hidden');
         if (hamburger) hamburger.classList.remove('active');
         document.body.classList.remove('sidebar-open');
+    } else {
+        document.body.classList.toggle('sidebar-open', sidebar && !sidebar.classList.contains('hidden'));
     }
 });
 
