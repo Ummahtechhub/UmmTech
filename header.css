@@ -82,6 +82,22 @@ header {
     transform: translateY(-50%);
 }
 
+.user-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.user-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(46, 139, 87, 0.15);
+    border: 2px solid rgba(46, 139, 87, 0.4);
+    background-size: cover;
+    background-position: center;
+}
+
 .user-name {
     font-size: 14px;
     color: var(--text-secondary);

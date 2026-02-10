@@ -757,6 +757,8 @@ body {
     transition: var(--transition-smooth);
     box-shadow: var(--shadow-sm);
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .project-card:hover {
@@ -798,6 +800,10 @@ body {
 .project-card h3 {
     font-size: 16px;
     color: var(--text-primary);
+}
+
+.project-card .card-text {
+    flex: 1;
 }
 
 .status-badge {
