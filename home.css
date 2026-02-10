@@ -712,6 +712,12 @@ body {
     margin-top: 20px;
 }
 
+@media (min-width: 1280px) {
+    .projects-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
 .project-tabs {
     display: flex;
     gap: 10px;
@@ -1764,14 +1770,15 @@ body.theme-dark .nav-btn:hover {
 /* Feed Media */
 .feed-media {
     width: 100%;
-    height: 260px;
-    object-fit: contain;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
     display: block;
     background: rgba(0, 0, 0, 0.04);
 }
 
 .feed-media-image {
-    max-height: 260px;
+    max-height: none;
     background: #ffffff;
 }
 
