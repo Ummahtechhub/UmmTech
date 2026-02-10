@@ -1430,14 +1430,14 @@ body.dark-mode .stat-card:hover {
     }
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1024px) {
     .dashboard-footer {
         margin-left: 0;
         width: 100%;
     }
 }
 
-@media (min-width: 1201px) {
+@media (min-width: 1280px) {
     .hamburger-btn {
         display: flex;
     }
