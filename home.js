@@ -282,6 +282,10 @@ function initializeSidebar() {
 
     if (!hamburger || !sidebar) return;
 
+    const setSidebarLock = () => {
+        document.body.classList.toggle('sidebar-open', !sidebar.classList.contains('hidden') && window.innerWidth <= 1200);
+    };
+
     if (window.innerWidth <= 1200) {
         sidebar.classList.add('hidden');
     }
@@ -289,9 +293,7 @@ function initializeSidebar() {
     hamburger.addEventListener('click', () => {
         hamburger.classList.toggle('active');
         sidebar.classList.toggle('hidden');
-        if (window.innerWidth <= 1200) {
-            document.body.classList.toggle('sidebar-open', !sidebar.classList.contains('hidden'));
-        }
+        setSidebarLock();
     });
 
     // Close sidebar on mobile when clicking outside
@@ -300,7 +302,7 @@ function initializeSidebar() {
             if (!sidebar.contains(e.target) && !hamburger.contains(e.target)) {
                 hamburger.classList.remove('active');
                 sidebar.classList.add('hidden');
-                document.body.classList.remove('sidebar-open');
+                setSidebarLock();
             }
         }
     });
@@ -362,11 +364,12 @@ function initializeNavigation() {
             }
 
             // Close sidebar on mobile
-            if (window.innerWidth <= 768) {
+            if (window.innerWidth <= 1200) {
                 const sidebar = document.getElementById('sidebar');
                 const hamburger = document.getElementById('hamburgerToggle');
                 if (sidebar) sidebar.classList.add('hidden');
                 if (hamburger) hamburger.classList.remove('active');
+                document.body.classList.remove('sidebar-open');
             }
         });
     });
@@ -430,11 +433,12 @@ function initializeQuickAccess() {
             targetNavBtn.click();
 
             // Close sidebar on mobile
-            if (window.innerWidth <= 768) {
+            if (window.innerWidth <= 1200) {
                 const sidebar = document.getElementById('sidebar');
                 const hamburger = document.getElementById('hamburgerToggle');
                 if (sidebar) sidebar.classList.add('hidden');
                 if (hamburger) hamburger.classList.remove('active');
+                document.body.classList.remove('sidebar-open');
             }
         }
     });
@@ -657,9 +661,10 @@ window.addEventListener('resize', () => {
     const sidebar = document.getElementById('sidebar');
     const hamburger = document.getElementById('hamburgerToggle');
     
-    if (window.innerWidth > 768) {
+    if (window.innerWidth > 1200) {
         if (sidebar) sidebar.classList.remove('hidden');
         if (hamburger) hamburger.classList.remove('active');
+        document.body.classList.remove('sidebar-open');
     }
 });
 

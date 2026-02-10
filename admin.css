@@ -33,6 +33,11 @@ body {
 
 body.sidebar-open {
     overflow: hidden;
+    height: 100vh;
+}
+
+body.sidebar-open .main-content {
+    pointer-events: none;
 }
 
 img,
