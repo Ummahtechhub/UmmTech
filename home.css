@@ -289,13 +289,13 @@ body.sidebar-open .main-content {
 
 /* Main Content */
 .main-content {
-    margin-left: var(--sidebar-width);
-    margin-top: var(--header-height);
-    width: calc(100% - var(--sidebar-width));
+    margin-left: 0;
+    margin-top: 0;
+    width: 100%;
     flex: 1;
     overflow: visible;
-    padding: 30px;
-    margin-right: 20px; /* Shift content to avoid sidebar override */
+    padding: 30px 30px 30px calc(var(--sidebar-width) + 30px);
+    margin-right: 0;
 }
 
 .content-page {
