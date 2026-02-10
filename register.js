@@ -12,7 +12,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const backToLogin = document.querySelector('a');
 
     // Dynamic link to login
-   indexLink.onclick = () => window.location.href = "index.html";
+// In register.js
+const backToLogin = document.getElementById("backToLogin");
+
+backToLogin.onclick = () => {
+  // Redirect to login page
+  window.location.href = "index.html"; // path relative to register.html
+};
+
 
 
     regForm.addEventListener('submit', async (e) => {
