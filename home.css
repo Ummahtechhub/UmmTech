@@ -289,12 +289,12 @@ body.sidebar-open .main-content {
 
 /* Main Content */
 .main-content {
-    margin-left: 0;
-    margin-top: 0;
-    width: 100%;
+    margin-left: var(--sidebar-width);
+    margin-top: var(--header-height);
+    width: calc(100% - var(--sidebar-width));
     flex: 1;
     overflow: visible;
-    padding: 30px 30px 30px calc(var(--sidebar-width) + 30px);
+    padding: 30px;
     margin-right: 0;
 }
 
