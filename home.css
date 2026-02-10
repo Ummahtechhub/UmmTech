@@ -228,6 +228,8 @@ body.sidebar-open .main-content {
     overflow-y: auto;
     transition: transform 0.3s ease;
     z-index: 999;
+    border-right: 1px solid var(--border-color);
+    border-radius: 0;
 }
 
 .sidebar.hidden {
@@ -294,8 +296,9 @@ body.sidebar-open .main-content {
     width: calc(100% - var(--sidebar-width));
     flex: 1;
     overflow: visible;
-    padding: 30px;
+    padding: 20px;
     margin-right: 0;
+    border-left: 1px solid var(--border-color);
 }
 
 .content-page {
