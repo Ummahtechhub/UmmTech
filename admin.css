@@ -740,6 +740,31 @@ p {
     }
 }
 
+@media (max-width: 1024px) {
+    .dashboard-header {
+        padding: 10px 14px;
+    }
+
+    .header-center h1 {
+        font-size: 22px;
+    }
+
+    .main-content {
+        margin-left: 0;
+        margin-top: var(--header-height);
+        width: 100%;
+        padding: 16px;
+    }
+
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar:not(.hidden) {
+        transform: translateX(0);
+    }
+}
+
 @media (max-width: 360px) {
     body {
         padding: 10px;
