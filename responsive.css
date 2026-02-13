@@ -366,6 +366,38 @@
 
 /* Small Desktop Styles */
 @media (max-width: 1279px) and (min-width: 1025px) {
+    .dashboard-container {
+        display: grid !important;
+        grid-template-columns: var(--sidebar-width) 1fr !important;
+        grid-template-rows: auto 1fr auto !important;
+    }
+
+    #header-placeholder,
+    #footer-placeholder {
+        grid-column: 1 / -1 !important;
+    }
+
+    #sidebar-placeholder {
+        grid-column: 1 !important;
+        grid-row: 2 !important;
+    }
+
+    #sidebar-placeholder .sidebar {
+        position: sticky !important;
+        top: 0 !important;
+        height: calc(100vh - var(--header-height)) !important;
+    }
+
+    #sidebar-placeholder + .main-content {
+        grid-column: 2 !important;
+        grid-row: 2 !important;
+        margin-left: 0 !important;
+        width: 100% !important;
+        margin-top: 0 !important;
+        border-left: 1px solid var(--border-color) !important;
+        border-top: 1px solid var(--border-color) !important;
+    }
+
     .stats-grid {
         grid-template-columns: repeat(3, 1fr);
     }
@@ -377,6 +409,38 @@
 
 /* Large Desktop Styles */
 @media (min-width: 1280px) {
+    .dashboard-container {
+        display: grid !important;
+        grid-template-columns: var(--sidebar-width) 1fr !important;
+        grid-template-rows: auto 1fr auto !important;
+    }
+
+    #header-placeholder,
+    #footer-placeholder {
+        grid-column: 1 / -1 !important;
+    }
+
+    #sidebar-placeholder {
+        grid-column: 1 !important;
+        grid-row: 2 !important;
+    }
+
+    #sidebar-placeholder .sidebar {
+        position: sticky !important;
+        top: 0 !important;
+        height: calc(100vh - var(--header-height)) !important;
+    }
+
+    #sidebar-placeholder + .main-content {
+        grid-column: 2 !important;
+        grid-row: 2 !important;
+        margin-left: 0 !important;
+        width: 100% !important;
+        margin-top: 0 !important;
+        border-left: 1px solid var(--border-color) !important;
+        border-top: 1px solid var(--border-color) !important;
+    }
+
     .stats-grid {
         grid-template-columns: repeat(4, 1fr);
     }
