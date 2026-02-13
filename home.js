@@ -26,6 +26,88 @@ const rtdb = getDatabase(app);
 
 let currentUser = null;
 let currentProfile = null;
+const roadmapTracks = [
+    { title: "Frontend", href: "https://roadmap.sh/frontend", iconClass: "fas fa-laptop-code", description: "Role roadmap." },
+    { title: "Backend", href: "https://roadmap.sh/backend", iconClass: "fas fa-server", description: "Role roadmap." },
+    { title: "DevOps", href: "https://roadmap.sh/devops", iconClass: "fas fa-cogs", description: "Role roadmap." },
+    { title: "Full Stack", href: "https://roadmap.sh/full-stack", iconClass: "fas fa-layer-group", description: "Role roadmap." },
+    { title: "AI Data Scientist", href: "https://roadmap.sh/ai-data-scientist", iconClass: "fas fa-brain", description: "Role roadmap." },
+    { title: "Data Analyst", href: "https://roadmap.sh/data-analyst", iconClass: "fas fa-chart-line", description: "Role roadmap." },
+    { title: "AI Engineer", href: "https://roadmap.sh/ai-engineer", iconClass: "fas fa-robot", description: "Role roadmap." },
+    { title: "Software Architect", href: "https://roadmap.sh/software-architect", iconClass: "fas fa-drafting-compass", description: "Role roadmap." },
+    { title: "Cyber Security", href: "https://roadmap.sh/cyber-security", iconClass: "fas fa-shield-alt", description: "Role roadmap." },
+    { title: "UX Design", href: "https://roadmap.sh/ux-design", iconClass: "fas fa-pencil-ruler", description: "Role roadmap." },
+    { title: "Game Developer", href: "https://roadmap.sh/game-developer", iconClass: "fas fa-gamepad", description: "Role roadmap." },
+    { title: "Technical Writer", href: "https://roadmap.sh/technical-writer", iconClass: "fas fa-pen-nib", description: "Role roadmap." },
+    { title: "MLOps", href: "https://roadmap.sh/mle", iconClass: "fas fa-microchip", description: "Role roadmap." },
+    { title: "Product Manager", href: "https://roadmap.sh/product-manager", iconClass: "fas fa-tasks", description: "Role roadmap." },
+    { title: "QA", href: "https://roadmap.sh/qa", iconClass: "fas fa-vial", description: "Role roadmap." },
+    { title: "Python", href: "https://roadmap.sh/python", iconClass: "fab fa-python", description: "Role roadmap." },
+    { title: "Software Design and Architecture", href: "https://roadmap.sh/software-design-architecture", iconClass: "fas fa-sitemap", description: "Role roadmap." },
+    { title: "Computer Science", href: "https://roadmap.sh/computer-science", iconClass: "fas fa-network-wired", description: "Role roadmap." },
+    { title: "React", href: "https://roadmap.sh/react", iconClass: "fab fa-react", description: "Role roadmap." },
+    { title: "Node.js", href: "https://roadmap.sh/nodejs", iconClass: "fab fa-node-js", description: "Role roadmap." },
+    { title: "Android", href: "https://roadmap.sh/android", iconClass: "fab fa-android", description: "Role roadmap." },
+    { title: "iOS", href: "https://roadmap.sh/ios", iconClass: "fab fa-apple", description: "Role roadmap." },
+    { title: "PostgreSQL", href: "https://roadmap.sh/postgresql", iconClass: "fas fa-database", description: "Role roadmap." },
+    { title: "Blockchain", href: "https://roadmap.sh/blockchain", iconClass: "fas fa-link", description: "Role roadmap." },
+    { title: "ASP.NET Core", href: "https://roadmap.sh/aspnet-core", iconClass: "fas fa-code", description: "Role roadmap." },
+    { title: "Java", href: "https://roadmap.sh/java", iconClass: "fab fa-java", description: "Role roadmap." },
+    { title: "Spring Boot", href: "https://roadmap.sh/spring-boot", iconClass: "fas fa-leaf", description: "Role roadmap." },
+    { title: "Design System", href: "https://roadmap.sh/design-system", iconClass: "fas fa-palette", description: "Role roadmap." },
+    { title: "API Design", href: "https://roadmap.sh/api-design", iconClass: "fas fa-plug", description: "Role roadmap." },
+    { title: "Code Review", href: "https://roadmap.sh/code-review", iconClass: "fas fa-code-branch", description: "Role roadmap." },
+    { title: "Prompt Engineering", href: "https://roadmap.sh/prompt-engineering", iconClass: "fas fa-comment-dots", description: "Role roadmap." },
+    { title: "AI Red Teaming", href: "https://roadmap.sh/ai-red-teaming", iconClass: "fas fa-user-secret", description: "Role roadmap." },
+    { title: "SQL", href: "https://roadmap.sh/sql", iconClass: "fas fa-table", description: "Skill roadmap." },
+    { title: "System Design", href: "https://roadmap.sh/system-design", iconClass: "fas fa-project-diagram", description: "Skill roadmap." },
+    { title: "API Security", href: "https://roadmap.sh/api-security", iconClass: "fas fa-lock", description: "Skill roadmap." },
+    { title: "MongoDB", href: "https://roadmap.sh/mongodb", iconClass: "fas fa-leaf", description: "Skill roadmap." },
+    { title: "Cloudflare", href: "https://roadmap.sh/cloudflare", iconClass: "fas fa-cloud", description: "Skill roadmap." },
+    { title: "Docker", href: "https://roadmap.sh/docker", iconClass: "fab fa-docker", description: "Skill roadmap." },
+    { title: "Kubernetes", href: "https://roadmap.sh/kubernetes", iconClass: "fas fa-dharmachakra", description: "Skill roadmap." },
+    { title: "Linux", href: "https://roadmap.sh/linux", iconClass: "fab fa-linux", description: "Skill roadmap." },
+    { title: "Terraform", href: "https://roadmap.sh/terraform", iconClass: "fas fa-mountain", description: "Skill roadmap." },
+    { title: "AWS", href: "https://roadmap.sh/aws", iconClass: "fab fa-aws", description: "Skill roadmap." },
+    { title: "Azure", href: "https://roadmap.sh/azure", iconClass: "fas fa-cloud", description: "Skill roadmap." },
+    { title: "Google Cloud", href: "https://roadmap.sh/google-cloud", iconClass: "fas fa-cloud", description: "Skill roadmap." },
+    { title: "JavaScript", href: "https://roadmap.sh/javascript", iconClass: "fab fa-js", description: "Skill roadmap." },
+    { title: "TypeScript", href: "https://roadmap.sh/typescript", iconClass: "fas fa-code", description: "Skill roadmap." },
+    { title: "Vue", href: "https://roadmap.sh/vue", iconClass: "fab fa-vuejs", description: "Skill roadmap." },
+    { title: "Angular", href: "https://roadmap.sh/angular", iconClass: "fab fa-angular", description: "Skill roadmap." },
+    { title: "Go", href: "https://roadmap.sh/go", iconClass: "fas fa-terminal", description: "Skill roadmap." },
+    { title: "Rust", href: "https://roadmap.sh/rust", iconClass: "fas fa-cog", description: "Skill roadmap." },
+    { title: "GraphQL", href: "https://roadmap.sh/graphql-design-patterns", iconClass: "fas fa-share-alt", description: "Skill roadmap." },
+    { title: "Design and Architecture", href: "https://roadmap.sh/design-and-architecture", iconClass: "fas fa-ruler-combined", description: "Skill roadmap." },
+    { title: "Design Patterns", href: "https://roadmap.sh/design-patterns", iconClass: "fas fa-shapes", description: "Skill roadmap." },
+    { title: "Redis", href: "https://roadmap.sh/redis", iconClass: "fas fa-memory", description: "Skill roadmap." },
+    { title: "React Native", href: "https://roadmap.sh/react-native", iconClass: "fas fa-mobile-alt", description: "Skill roadmap." },
+    { title: "Flutter", href: "https://roadmap.sh/flutter", iconClass: "fas fa-feather-alt", description: "Skill roadmap." },
+    { title: "AI Agents", href: "https://roadmap.sh/ai-agents", iconClass: "fas fa-robot", description: "Skill roadmap." },
+    { title: "Coding Interview", href: "https://roadmap.sh/coding-interview", iconClass: "fas fa-user-check", description: "Skill roadmap." },
+    { title: "JavaScript Interview", href: "https://roadmap.sh/javascript-interview", iconClass: "fas fa-user-check", description: "Skill roadmap." },
+    { title: "React Interview", href: "https://roadmap.sh/react-interview", iconClass: "fas fa-user-check", description: "Skill roadmap." },
+    { title: "Frontend Interview", href: "https://roadmap.sh/frontend-interview", iconClass: "fas fa-user-check", description: "Skill roadmap." },
+    { title: "Backend Interview", href: "https://roadmap.sh/backend-interview", iconClass: "fas fa-user-check", description: "Skill roadmap." },
+    { title: "DevOps Interview", href: "https://roadmap.sh/devops-interview", iconClass: "fas fa-user-check", description: "Skill roadmap." },
+    { title: "System Design Interview", href: "https://roadmap.sh/system-design-interview", iconClass: "fas fa-user-check", description: "Skill roadmap." },
+    { title: "TypeScript Interview", href: "https://roadmap.sh/typescript-interview", iconClass: "fas fa-user-check", description: "Skill roadmap." },
+    { title: "Backend Performance", href: "https://roadmap.sh/best-practices/backend-performance", iconClass: "fas fa-tachometer-alt", description: "Best practices roadmap." },
+    { title: "Frontend Performance", href: "https://roadmap.sh/best-practices/frontend-performance", iconClass: "fas fa-tachometer-alt", description: "Best practices roadmap." },
+    { title: "Code Review Best Practices", href: "https://roadmap.sh/best-practices/code-review", iconClass: "fas fa-code-branch", description: "Best practices roadmap." },
+    { title: "AWS Best Practices", href: "https://roadmap.sh/best-practices/aws", iconClass: "fab fa-aws", description: "Best practices roadmap." },
+    { title: "React Best Practices", href: "https://roadmap.sh/best-practices/react", iconClass: "fab fa-react", description: "Best practices roadmap." }
+];
+const projectIdeaTracks = [
+    { title: "All Project Ideas", href: "https://roadmap.sh/projects", iconClass: "fas fa-lightbulb", description: "Project ideas." },
+    { title: "Frontend Project Ideas", href: "https://roadmap.sh/frontend/projects", iconClass: "fas fa-laptop-code", description: "Project ideas." },
+    { title: "Backend Project Ideas", href: "https://roadmap.sh/backend/projects", iconClass: "fas fa-server", description: "Project ideas." },
+    { title: "Full Stack Project Ideas", href: "https://roadmap.sh/full-stack/projects", iconClass: "fas fa-layer-group", description: "Project ideas." },
+    { title: "DevOps Project Ideas", href: "https://roadmap.sh/devops/projects", iconClass: "fas fa-cogs", description: "Project ideas." },
+    { title: "Android Project Ideas", href: "https://roadmap.sh/android/projects", iconClass: "fab fa-android", description: "Project ideas." },
+    { title: "Cyber Security Project Ideas", href: "https://roadmap.sh/cyber-security/projects", iconClass: "fas fa-shield-alt", description: "Project ideas." },
+    { title: "AI Engineer Project Ideas", href: "https://roadmap.sh/ai-engineer/projects", iconClass: "fas fa-robot", description: "Project ideas." }
+];
 
 // Dashboard Initialization
 function initDashboard() {
@@ -77,6 +159,7 @@ function initDashboard() {
     initializeSidebar();
     initializeLogout();
     initializeQuickAccess();
+    renderRoadmapCards();
     initializeProfileForm();
     initializeSettingsForm();
     initializeProjectForm();
@@ -312,7 +395,7 @@ function initializeSidebar() {
 // Initialize Navigation
 function initializeNavigation() {
     const navButtons = document.querySelectorAll('.nav-btn[data-page]');
-    const contentPlaceholders = document.querySelectorAll('#overview-placeholder, #feed-placeholder, #events-placeholder, #projects-placeholder, #teams-placeholder, #repository-placeholder, #profile-placeholder, #settings-placeholder');
+    const contentPlaceholders = document.querySelectorAll('#overview-placeholder, #feed-placeholder, #events-placeholder, #projects-placeholder, #teams-placeholder, #repository-placeholder, #roadmap-placeholder, #profile-placeholder, #settings-placeholder');
 
     navButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -349,6 +432,7 @@ function initializeNavigation() {
                     projects: 'Projects',
                     teams: 'Teams',
                     repository: 'Repository',
+                    roadmap: 'Learning Roadmaps',
                     profile: 'Ummah TechHub',
                     settings: 'Ummah TechHub'
                 };
@@ -442,6 +526,66 @@ function initializeQuickAccess() {
                 document.body.classList.remove('sidebar-open');
             }
         }
+    });
+}
+
+function renderRoadmapCards() {
+    const roadmapGrid = document.getElementById('roadmapGrid');
+    if (!roadmapGrid) return;
+
+    roadmapGrid.innerHTML = '';
+
+    const allTracks = [...roadmapTracks, ...projectIdeaTracks];
+    const sections = [
+        {
+            title: 'Role-based Roadmaps',
+            matches: (track) => track.description === 'Role roadmap.'
+        },
+        {
+            title: 'Skill-based Roadmaps',
+            matches: (track) => track.description === 'Skill roadmap.'
+        },
+        {
+            title: 'Project Ideas',
+            matches: (track) => track.description === 'Project ideas.'
+        },
+        {
+            title: 'Best Practices',
+            matches: (track) => track.description === 'Best practices roadmap.'
+        }
+    ];
+
+    sections.forEach((section) => {
+        const items = allTracks.filter(section.matches);
+        if (!items.length) return;
+
+        const sectionWrap = document.createElement('section');
+        sectionWrap.className = 'roadmap-category';
+
+        const heading = document.createElement('h3');
+        heading.className = 'roadmap-category-title';
+        heading.textContent = section.title;
+        sectionWrap.appendChild(heading);
+
+        const grid = document.createElement('div');
+        grid.className = 'roadmap-grid';
+
+        items.forEach((track) => {
+            const card = document.createElement('a');
+            card.className = 'roadmap-card';
+            card.href = track.href;
+            card.target = '_blank';
+            card.rel = 'noopener noreferrer';
+            card.innerHTML = `
+                <h3><i class="${track.iconClass}"></i> ${track.title}</h3>
+                <p>${track.description}</p>
+                <span>${section.title === 'Project Ideas' ? 'Explore Project Ideas' : `Open ${track.title} Roadmap`}</span>
+            `;
+            grid.appendChild(card);
+        });
+
+        sectionWrap.appendChild(grid);
+        roadmapGrid.appendChild(sectionWrap);
     });
 }
 
