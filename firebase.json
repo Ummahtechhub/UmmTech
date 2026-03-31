@@ -1,5 +1,14 @@
 {
   "functions": {
     "source": "functions"
+  },
+  "database": {
+    "rules": "REALTIME_DATABASE_RULES.json"
+  },
+  "firestore": {
+    "rules": "FIRESTORE_SECURITY_RULES.txt"
+  },
+  "storage": {
+    "rules": "FIREBASE_STORAGE_RULES.txt"
   }
 }

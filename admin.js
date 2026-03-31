@@ -110,6 +110,8 @@ const IMAGE_MAX_ATTEMPTS = 15;
 const RTDB_MAX_STRING = 1_000_000; // ~1MB string cap
 const IMAGE_RTDB_MAX_BYTES = 680 * 1024; // keep base64 safely under ~1MB
 const VIDEO_THUMB_MAX_BYTES = 200 * 1024;
+const IMAGE_UPLOAD_CONCURRENCY = 2;
+const DEFAULT_UPLOAD_CONCURRENCY = 3;
 
 function readFileAsDataURL(file) {
     return new Promise((resolve, reject) => {
@@ -126,7 +128,8 @@ async function getImageSource(file) {
         return {
             width: bitmap.width,
             height: bitmap.height,
-            draw: (ctx, w, h) => ctx.drawImage(bitmap, 0, 0, w, h)
+            draw: (ctx, w, h) => ctx.drawImage(bitmap, 0, 0, w, h),
+            cleanup: () => bitmap.close()
         };
     }
 
@@ -141,50 +144,11 @@ async function getImageSource(file) {
     return {
         width: img.naturalWidth || img.width,
         height: img.naturalHeight || img.height,
-        draw: (ctx, w, h) => ctx.drawImage(img, 0, 0, w, h)
+        draw: (ctx, w, h) => ctx.drawImage(img, 0, 0, w, h),
+        cleanup: () => {
+            img.removeAttribute("src");
+        }
     };
-}
-
-async function canvasToBlob(canvas, quality) {
-    let blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", quality));
-    if (blob) return blob;
-    const dataUrl = canvas.toDataURL("image/jpeg", quality);
-    const resp = await fetch(dataUrl);
-    return resp.blob();
-}
-
-async function compressImageToLimit(file, maxBytes) {
-    if (!file.type.startsWith("image/")) return file;
-
-    const source = await getImageSource(file);
-    let width = source.width;
-    let height = source.height;
-    const maxWidth = IMAGE_MAX_WIDTH;
-    if (width > maxWidth) {
-        const ratio = maxWidth / width;
-        width = Math.round(width * ratio);
-        height = Math.round(height * ratio);
-    }
-
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext("2d");
-    source.draw(ctx, width, height);
-
-    let quality = IMAGE_QUALITY_START;
-    let blob = await canvasToBlob(canvas, quality);
-
-    while (blob && blob.size > maxBytes && quality > IMAGE_MIN_QUALITY) {
-        quality -= 0.1;
-        blob = await canvasToBlob(canvas, quality);
-    }
-
-    if (!blob || blob.size > maxBytes) {
-        throw new Error("Image is too large even after compression.");
-    }
-
-    return new File([blob], file.name.replace(/\.[^/.]+$/, ".jpg"), { type: "image/jpeg" });
 }
 
 function dataUrlSizeBytes(dataUrl) {
@@ -195,40 +159,64 @@ function dataUrlSizeBytes(dataUrl) {
 
 async function compressImageToDataUrl(file, maxBytes) {
     const source = await getImageSource(file);
-    let width = source.width;
-    let height = source.height;
-    const maxWidth = IMAGE_MAX_WIDTH;
-    if (width > maxWidth) {
-        const ratio = maxWidth / width;
-        width = Math.round(width * ratio);
-        height = Math.round(height * ratio);
-    }
-
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    let quality = IMAGE_QUALITY_START;
-    let scale = 1;
-    let dataUrl = "";
-
-    for (let i = 0; i < IMAGE_MAX_ATTEMPTS; i += 1) {
-        canvas.width = Math.max(1, Math.round(width * scale));
-        canvas.height = Math.max(1, Math.round(height * scale));
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        source.draw(ctx, canvas.width, canvas.height);
-        dataUrl = canvas.toDataURL("image/jpeg", quality);
-
-        if (dataUrlSizeBytes(dataUrl) <= maxBytes) {
-            return dataUrl;
+    try {
+        let width = source.width;
+        let height = source.height;
+        const maxWidth = IMAGE_MAX_WIDTH;
+        if (width > maxWidth) {
+            const ratio = maxWidth / width;
+            width = Math.round(width * ratio);
+            height = Math.round(height * ratio);
         }
 
-        if (quality > IMAGE_MIN_QUALITY) {
-            quality = Math.max(IMAGE_MIN_QUALITY, quality - 0.1);
-        } else {
-            scale *= IMAGE_SCALE_STEP;
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        let quality = IMAGE_QUALITY_START;
+        let scale = 1;
+        let dataUrl = "";
+
+        for (let i = 0; i < IMAGE_MAX_ATTEMPTS; i += 1) {
+            canvas.width = Math.max(1, Math.round(width * scale));
+            canvas.height = Math.max(1, Math.round(height * scale));
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            source.draw(ctx, canvas.width, canvas.height);
+            dataUrl = canvas.toDataURL("image/jpeg", quality);
+
+            if (dataUrlSizeBytes(dataUrl) <= maxBytes) {
+                canvas.width = 1;
+                canvas.height = 1;
+                return dataUrl;
+            }
+
+            if (quality > IMAGE_MIN_QUALITY) {
+                quality = Math.max(IMAGE_MIN_QUALITY, quality - 0.1);
+            } else {
+                scale *= IMAGE_SCALE_STEP;
+            }
+        }
+    } finally {
+        source.cleanup?.();
+    }
+
+    throw new Error("Image is too large to fit within the base64 upload limit.");
+}
+
+async function mapWithConcurrency(items, limit, mapper) {
+    const list = Array.from(items);
+    const results = new Array(list.length);
+    let cursor = 0;
+
+    async function worker() {
+        while (cursor < list.length) {
+            const index = cursor;
+            cursor += 1;
+            results[index] = await mapper(list[index], index);
         }
     }
 
-    throw new Error("Image is too large to fit within 1MB base64 limit.");
+    const workerCount = Math.min(Math.max(limit, 1), list.length || 1);
+    await Promise.all(Array.from({ length: workerCount }, () => worker()));
+    return results;
 }
 
 async function videoToThumbnailDataUrl(file, maxBytes) {
@@ -301,16 +289,18 @@ async function videoToThumbnailDataUrl(file, maxBytes) {
 }
 
 async function uploadFiles(files, category, story, type) {
-    const uploadPromises = Array.from(files).map(async (file) => {
-        let processedFile = file;
+    const concurrency = type === "images" ? IMAGE_UPLOAD_CONCURRENCY : DEFAULT_UPLOAD_CONCURRENCY;
+
+    return mapWithConcurrency(files, concurrency, async (file) => {
         let compressedDataUrl = "";
         let thumbnailDataUrl = "";
         let downloadURL = "";
         let storagePath = "";
+        const timestamp = Date.now();
+        const uploadId = `${type}-${timestamp}-${Math.random().toString(36).slice(2, 8)}`;
 
         if (type === "images" && file.type.startsWith("image/")) {
-            processedFile = await compressImageToLimit(file, MAX_UPLOAD_BYTES);
-            compressedDataUrl = await compressImageToDataUrl(processedFile, IMAGE_RTDB_MAX_BYTES);
+            compressedDataUrl = await compressImageToDataUrl(file, IMAGE_RTDB_MAX_BYTES);
         } else if (file.size > MAX_UPLOAD_BYTES) {
             throw new Error(`File "${file.name}" exceeds 1MB. Please upload smaller files.`);
         }
@@ -323,40 +313,46 @@ async function uploadFiles(files, category, story, type) {
             }
         }
 
-        const timestamp = Date.now();
-        const fileName = `${timestamp}_${processedFile.name}`;
-        storagePath = `${type}/${fileName}`;
+        if (!(type === "images" && compressedDataUrl)) {
+            const fileName = `${timestamp}_${file.name}`;
+            storagePath = `${type}/${fileName}`;
 
-        try {
-            const storageRef = ref(storage, storagePath);
-            const snapshot = await uploadBytes(storageRef, processedFile);
-            downloadURL = await getDownloadURL(snapshot.ref);
-        } catch (error) {
-            if (type === "images" && compressedDataUrl) {
-                downloadURL = "";
-            } else {
-                throw error;
+            try {
+                const storageRef = ref(storage, storagePath);
+                const snapshot = await uploadBytes(storageRef, file);
+                downloadURL = await getDownloadURL(snapshot.ref);
+            } catch (error) {
+                if (type === "images" && compressedDataUrl) {
+                    downloadURL = "";
+                } else {
+                    throw error;
+                }
             }
         }
 
-        const docData = {
-            fileName: processedFile.name,
-            fileURL: downloadURL,
-            storagePath: storagePath,
-            category: category,
-            description: story,
-            uploadedBy: currentUser?.email || "unknown",
-            uploadedAt: serverTimestamp(),
-            likes: 0,
-            shares: 0,
-            comments: [],
-            type: type,
-            compressedURL: ""
-        };
+        if (type !== "images") {
+            const docData = {
+                uploadId: uploadId,
+                fileName: file.name,
+                fileURL: downloadURL,
+                storagePath: storagePath,
+                category: category,
+                description: story,
+                uploadedBy: currentUser?.email || "unknown",
+                uploadedAt: serverTimestamp(),
+                likes: 0,
+                shares: 0,
+                comments: [],
+                type: type,
+                compressedURL: ""
+            };
 
-        await addDoc(collection(db, type), docData);
+            await addDoc(collection(db, type), docData);
+        }
+
         await dbPush(dbRef(rtdb, `uploads/${type}`), {
-            fileName: processedFile.name,
+            uploadId: uploadId,
+            fileName: file.name,
             fileURL: downloadURL,
             storagePath: storagePath,
             category: category,
@@ -368,14 +364,14 @@ async function uploadFiles(files, category, story, type) {
             thumbnailURL: thumbnailDataUrl || ""
         });
 
-        saveLocalContent(type, processedFile, category, story, downloadURL);
-        return downloadURL;
+        saveLocalContent(type, file, category, story, downloadURL);
+        return downloadURL || compressedDataUrl;
     });
-
-    return Promise.all(uploadPromises);
 }
 
 function saveLocalContent(type, file, category, story, downloadURL) {
+    if (type === "images" && !downloadURL) return;
+
     const keyMap = {
         images: "ummah_images",
         videos: "ummah_videos",
@@ -403,19 +399,45 @@ function saveLocalContent(type, file, category, story, downloadURL) {
     localStorage.setItem(storageKey, JSON.stringify(existing));
 }
 
+function getUploadIdentity(item, type) {
+    const itemType = type || item.type || item.collection || "upload";
+    if (item.uploadId) return `${itemType}|id|${item.uploadId}`;
+    if (item.storagePath) return `${itemType}|storage|${item.storagePath}`;
+    if (item.fileURL) return `${itemType}|url|${item.fileURL}`;
+    if (item.compressedURL) {
+        return `${itemType}|inline|${item.fileName || ""}|${item.category || ""}|${item.description || ""}|${item.compressedURL.slice(0, 96)}`;
+    }
+    return `${itemType}|meta|${item.fileName || item.title || ""}|${item.category || ""}|${item.description || ""}|${item.uploadedAt?.seconds || item.uploadedAt || ""}`;
+}
+
+function countDistinctUploads(items, type) {
+    const seen = new Set();
+    items.forEach((item) => {
+        seen.add(getUploadIdentity(item, type));
+    });
+    return seen.size;
+}
+
 async function updateStats() {
     try {
-        const collections = ["images", "videos", "files"];
-        let totalImages = 0, totalVideos = 0, totalFiles = 0;
+        const [imagesSnap, videosSnap, filesSnap, uploadsSnap] = await Promise.all([
+            getDocs(query(collection(db, "images"))),
+            getDocs(query(collection(db, "videos"))),
+            getDocs(query(collection(db, "files"))),
+            dbGet(dbRef(rtdb, "uploads"))
+        ]);
 
-        for (const collectionName of collections) {
-            const q = query(collection(db, collectionName));
-            const querySnapshot = await getDocs(q);
-            const count = querySnapshot.size;
-            if (collectionName === "images") totalImages = count;
-            else if (collectionName === "videos") totalVideos = count;
-            else if (collectionName === "files") totalFiles = count;
-        }
+        const firestoreImages = imagesSnap.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+        const firestoreVideos = videosSnap.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+        const firestoreFiles = filesSnap.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+        const uploads = uploadsSnap.exists() ? uploadsSnap.val() || {} : {};
+        const realtimeImages = uploads.images ? Object.values(uploads.images) : [];
+        const realtimeVideos = uploads.videos ? Object.values(uploads.videos) : [];
+        const realtimeFiles = uploads.files ? Object.values(uploads.files) : [];
+
+        const totalImages = countDistinctUploads([...firestoreImages, ...realtimeImages], "images");
+        const totalVideos = countDistinctUploads([...firestoreVideos, ...realtimeVideos], "videos");
+        const totalFiles = countDistinctUploads([...firestoreFiles, ...realtimeFiles], "files");
 
         const totalImagesEl = document.getElementById("totalImages");
         const totalVideosEl = document.getElementById("totalVideos");
