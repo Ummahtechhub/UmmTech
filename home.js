@@ -1086,6 +1086,8 @@ async function loadEvents() {
         return true;
     });
 
+    eventMedia = groupBatchedImageUploads(eventMedia);
+
     renderEvents(events, eventMedia);
 }
 
@@ -1120,7 +1122,10 @@ function renderEvents(events, eventMedia = []) {
     eventMedia.forEach((item) => {
         const mediaCard = document.createElement('div');
         mediaCard.className = 'event-card event-feed-card';
-        const titleText = formatUploadTitle(item.fileName || item.filename || item.title || item.name, item.type === 'video' ? 'Event Video' : 'Event Image');
+        const titleText = formatUploadTitle(
+            item.fileName || item.filename || item.title || item.name,
+            item.type === 'video' ? 'Event Video' : item.type === 'image-gallery' ? `${item.images?.length || 2} Event Photos` : 'Event Image'
+        );
         const descriptionText = item.description || item.story || item.content || 'Event media uploaded by the admin team.';
         const mediaUrl = item.type === 'video'
             ? (item.fileURL || item.url || '')
@@ -1136,8 +1141,10 @@ function renderEvents(events, eventMedia = []) {
                     ? (mediaUrl
                         ? `<video src="${mediaUrl}" ${poster ? `poster="${poster}"` : ''} controls preload="metadata"></video>`
                         : `<i class="fas fa-play-circle" style="font-size: 40px; color: #2e8b57;"></i>`)
+                    : item.type === 'image-gallery'
+                        ? createUploadGalleryMarkup(item.images, titleText)
                     : (mediaUrl
-                        ? `<button type="button" class="feed-media-open" onclick="window.openFeedMedia('${mediaUrl}', '${titleText.replace(/'/g, "\\'")}')"><img src="${mediaUrl}" alt="${titleText}"></button>`
+                        ? `<button type="button" class="feed-media-open" onclick="window.openFeedMedia('${escapeSingleQuote(mediaUrl)}', '${escapeSingleQuote(titleText)}')"><img src="${mediaUrl}" alt="${titleText}"></button>`
                         : `<i class="fas fa-image" style="font-size: 40px; color: #2e8b57;"></i>`)}
             </div>
             <div class="event-card-content">
@@ -2143,10 +2150,12 @@ async function loadFeed() {
         return true;
     });
 
+    feedItems = groupBatchedImageUploads(feedItems);
+
     // Sort by most recent
     feedItems.sort((a, b) => {
-        const dateA = a.uploadedAt?.seconds ? a.uploadedAt.seconds * 1000 : (a.id || 0);
-        const dateB = b.uploadedAt?.seconds ? b.uploadedAt.seconds * 1000 : (b.id || 0);
+        const dateA = getUploadTimestamp(a);
+        const dateB = getUploadTimestamp(b);
         return dateB - dateA;
     });
 
@@ -2182,6 +2191,83 @@ function dedupeMediaItems(items) {
         seen.add(key);
         return true;
     });
+}
+
+function getUploadTimestamp(item) {
+    if (item.uploadedAt?.seconds) return item.uploadedAt.seconds * 1000;
+    if (typeof item.uploadedAt === 'number') return item.uploadedAt;
+    if (typeof item.createdAt === 'number') return item.createdAt;
+    if (typeof item.id === 'number') return item.id;
+    return 0;
+}
+
+function escapeSingleQuote(value = '') {
+    return String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\r?\n/g, ' ');
+}
+
+function groupBatchedImageUploads(items) {
+    const groupedItems = [];
+    const galleryMap = new Map();
+
+    items.forEach((item) => {
+        if (item.type !== 'image' || !item.batchId || Number(item.batchSize || 1) < 2) {
+            groupedItems.push(item);
+            return;
+        }
+
+        const key = `${normalizeDestination(item.category)}|${item.batchId}`;
+        const imageUrl = item.compressedURL || item.fileURL || item.url || item.thumbnail || '';
+        if (!imageUrl) return;
+
+        if (!galleryMap.has(key)) {
+            const galleryItem = {
+                ...item,
+                type: 'image-gallery',
+                images: []
+            };
+            galleryMap.set(key, galleryItem);
+            groupedItems.push(galleryItem);
+        }
+
+        galleryMap.get(key).images.push({
+            ...item,
+            mediaUrl: imageUrl
+        });
+    });
+
+    groupedItems.forEach((item) => {
+        if (item.type !== 'image-gallery') return;
+        item.images.sort((a, b) => (a.batchIndex || 0) - (b.batchIndex || 0));
+        if (item.images[0]) {
+            Object.assign(item, {
+                ...item.images[0],
+                type: 'image-gallery',
+                images: item.images
+            });
+        }
+    });
+
+    return groupedItems;
+}
+
+function createUploadGalleryMarkup(images, titleText) {
+    const safeImages = Array.isArray(images) ? images.filter((item) => item?.mediaUrl) : [];
+    if (safeImages.length === 0) return '';
+
+    const visibleImages = safeImages.slice(0, 4);
+    const extraCount = safeImages.length - visibleImages.length;
+    const gridClass = visibleImages.length === 1 ? 'upload-gallery-grid single' : 'upload-gallery-grid';
+
+    return `
+        <div class="${gridClass}">
+            ${visibleImages.map((image, index) => `
+                <button type="button" class="upload-gallery-item" onclick="window.openFeedMedia('${escapeSingleQuote(image.mediaUrl)}', '${escapeSingleQuote(formatUploadTitle(image.fileName || image.filename || image.title || image.name, titleText))}')">
+                    <img src="${image.mediaUrl}" alt="${formatUploadTitle(image.fileName || image.filename || image.title || image.name, titleText)}">
+                    ${extraCount > 0 && index === visibleImages.length - 1 ? `<span class="upload-gallery-more">+${extraCount}</span>` : ''}
+                </button>
+            `).join('')}
+        </div>
+    `;
 }
 
 function normalizeDestination(category = '') {
@@ -2244,9 +2330,18 @@ function createFeedCard(item) {
         const imageUrl = item.compressedURL || item.fileURL || item.url || item.thumbnail || '';
         content = `
             <div class="feed-card-media-shell">
-                <button type="button" class="feed-media-open" onclick="window.openFeedMedia('${imageUrl}', '${titleText.replace(/'/g, "\\'")}')">
+                <button type="button" class="feed-media-open" onclick="window.openFeedMedia('${escapeSingleQuote(imageUrl)}', '${escapeSingleQuote(titleText)}')">
                     <img src="${imageUrl}" class="feed-media feed-media-image" alt="${titleText}">
                 </button>
+            </div>
+            <div class="feed-card-body">
+                <p style="font-size: 13px;">${shortDesc}</p>
+            </div>
+        `;
+    } else if (item.type === 'image-gallery') {
+        content = `
+            <div class="feed-card-media-shell">
+                ${createUploadGalleryMarkup(item.images, titleText)}
             </div>
             <div class="feed-card-body">
                 <p style="font-size: 13px;">${shortDesc}</p>

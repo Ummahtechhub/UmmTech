@@ -102,15 +102,15 @@ window.addEventListener("resize", () => {
 });
 
 const MAX_UPLOAD_BYTES = 1 * 1024 * 1024;
-const IMAGE_QUALITY_START = 0.75;
+const IMAGE_QUALITY_START = 0.7;
 const IMAGE_MIN_QUALITY = 0.3;
-const IMAGE_MAX_WIDTH = 1600;
+const IMAGE_MAX_WIDTH = 1280;
 const IMAGE_SCALE_STEP = 0.85;
-const IMAGE_MAX_ATTEMPTS = 15;
+const IMAGE_MAX_ATTEMPTS = 9;
 const RTDB_MAX_STRING = 1_000_000; // ~1MB string cap
 const IMAGE_RTDB_MAX_BYTES = 680 * 1024; // keep base64 safely under ~1MB
 const VIDEO_THUMB_MAX_BYTES = 200 * 1024;
-const IMAGE_UPLOAD_CONCURRENCY = 2;
+const IMAGE_UPLOAD_CONCURRENCY = 3;
 const DEFAULT_UPLOAD_CONCURRENCY = 3;
 
 function readFileAsDataURL(file) {
@@ -288,10 +288,16 @@ async function videoToThumbnailDataUrl(file, maxBytes) {
     });
 }
 
-async function uploadFiles(files, category, story, type) {
-    const concurrency = type === "images" ? IMAGE_UPLOAD_CONCURRENCY : DEFAULT_UPLOAD_CONCURRENCY;
+function createUploadBatchId(type) {
+    return `${type}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
 
-    return mapWithConcurrency(files, concurrency, async (file) => {
+async function uploadFiles(files, category, story, type, options = {}) {
+    const concurrency = type === "images" ? IMAGE_UPLOAD_CONCURRENCY : DEFAULT_UPLOAD_CONCURRENCY;
+    const batchId = options.batchId || createUploadBatchId(type);
+    const batchSize = Array.from(files).length;
+
+    return mapWithConcurrency(files, concurrency, async (file, index) => {
         let compressedDataUrl = "";
         let thumbnailDataUrl = "";
         let downloadURL = "";
@@ -333,6 +339,9 @@ async function uploadFiles(files, category, story, type) {
         if (type !== "images") {
             const docData = {
                 uploadId: uploadId,
+                batchId: batchId,
+                batchSize: batchSize,
+                batchIndex: index,
                 fileName: file.name,
                 fileURL: downloadURL,
                 storagePath: storagePath,
@@ -352,6 +361,9 @@ async function uploadFiles(files, category, story, type) {
 
         await dbPush(dbRef(rtdb, `uploads/${type}`), {
             uploadId: uploadId,
+            batchId: batchId,
+            batchSize: batchSize,
+            batchIndex: index,
             fileName: file.name,
             fileURL: downloadURL,
             storagePath: storagePath,
@@ -364,12 +376,16 @@ async function uploadFiles(files, category, story, type) {
             thumbnailURL: thumbnailDataUrl || ""
         });
 
-        saveLocalContent(type, file, category, story, downloadURL);
+        saveLocalContent(type, file, category, story, downloadURL, {
+            batchId,
+            batchSize,
+            batchIndex: index
+        });
         return downloadURL || compressedDataUrl;
     });
 }
 
-function saveLocalContent(type, file, category, story, downloadURL) {
+function saveLocalContent(type, file, category, story, downloadURL, batchMeta = {}) {
     if (type === "images" && !downloadURL) return;
 
     const keyMap = {
@@ -391,7 +407,10 @@ function saveLocalContent(type, file, category, story, downloadURL) {
         fileURL: downloadURL,
         filename: file.name,
         fileName: file.name,
-        size: file.size || 0
+        size: file.size || 0,
+        batchId: batchMeta.batchId || "",
+        batchSize: batchMeta.batchSize || 1,
+        batchIndex: batchMeta.batchIndex || 0
     };
 
     const existing = JSON.parse(localStorage.getItem(storageKey) || "[]");
@@ -465,7 +484,7 @@ if (imageForm) imageForm.addEventListener("submit", async (e) => {
     }
 
     try {
-        await uploadFiles(files, category, story, "images");
+        await uploadFiles(files, category, story, "images", { batchId: createUploadBatchId("images") });
         alert("Images uploaded successfully!");
         document.getElementById("image-category").value = "";
         document.getElementById("image-story").value = "";
@@ -490,7 +509,7 @@ if (videoForm) videoForm.addEventListener("submit", async (e) => {
     }
 
     try {
-        await uploadFiles(files, category, story, "videos");
+        await uploadFiles(files, category, story, "videos", { batchId: createUploadBatchId("videos") });
         alert("Videos uploaded successfully!");
         document.getElementById("video-category").value = "";
         document.getElementById("video-story").value = "";
@@ -515,7 +534,7 @@ if (fileForm) fileForm.addEventListener("submit", async (e) => {
     }
 
     try {
-        await uploadFiles(files, category, story, "files");
+        await uploadFiles(files, category, story, "files", { batchId: createUploadBatchId("files") });
         alert("Files uploaded successfully!");
         document.getElementById("file-category").value = "";
         document.getElementById("file-story").value = "";
