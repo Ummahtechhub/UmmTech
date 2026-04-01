@@ -1032,29 +1032,70 @@ window.addEventListener('resize', () => {
 
 
 async function loadEvents() {
-    const upcomingGrid = document.getElementById('upcomingEventsGrid');
-    if (!upcomingGrid) return;
+    const eventsContainer = document.getElementById('eventsContainer');
+    if (!eventsContainer) return;
 
-    upcomingGrid.innerHTML = '';
+    eventsContainer.innerHTML = '';
+    let events = [];
+    let eventMedia = [];
 
     try {
         const eventsQuery = query(collection(db, 'events'), orderBy('startDateTime', 'desc'));
-        const snapshot = await getDocs(eventsQuery);
-        const events = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderEvents(events);
+        const imagesQuery = query(collection(db, 'images'), orderBy('uploadedAt', 'desc'));
+        const videosQuery = query(collection(db, 'videos'), orderBy('uploadedAt', 'desc'));
+        const [eventsSnap, imagesSnap, videosSnap] = await Promise.all([
+            getDocs(eventsQuery),
+            getDocs(imagesQuery),
+            getDocs(videosQuery)
+        ]);
+
+        events = eventsSnap.docs.map((docSnap) => ({ id: docSnap.id, __kind: 'event', ...docSnap.data() }));
+        eventMedia = [
+            ...imagesSnap.docs.map((docSnap) => ({ id: docSnap.id, type: 'image', __kind: 'media', ...docSnap.data() })),
+            ...videosSnap.docs.map((docSnap) => ({ id: docSnap.id, type: 'video', __kind: 'media', ...docSnap.data() }))
+        ].filter((item) => normalizeDestination(item.category) === 'event');
     } catch (e) {
         console.error('Failed to load events:', e);
-        upcomingGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 40px;">Unable to load events.</p>';
     }
+
+    try {
+        const uploadsSnap = await dbGet(dbRef(rtdb, 'uploads'));
+        if (uploadsSnap.exists()) {
+            const uploads = uploadsSnap.val() || {};
+            const rtdbImages = uploads.images ? Object.values(uploads.images).map((item) => ({ type: 'image', __kind: 'media', ...item })) : [];
+            const rtdbVideos = uploads.videos ? Object.values(uploads.videos).map((item) => ({ type: 'video', __kind: 'media', ...item })) : [];
+            eventMedia = [
+                ...eventMedia,
+                ...rtdbImages.filter((item) => normalizeDestination(item.category) === 'event'),
+                ...rtdbVideos.filter((item) => normalizeDestination(item.category) === 'event')
+            ];
+        }
+    } catch (e) {
+        console.error('Event realtime load failed:', e);
+    }
+
+    eventMedia = dedupeMediaItems(eventMedia).filter((item) => {
+        if (item.type === 'image') {
+            return Boolean(item.compressedURL || item.fileURL || item.url || item.thumbnail);
+        }
+
+        if (item.type === 'video') {
+            return Boolean(item.fileURL || item.url || item.thumbnailURL || item.thumbnail || item.compressedURL);
+        }
+
+        return true;
+    });
+
+    renderEvents(events, eventMedia);
 }
 
-function renderEvents(events) {
-    const upcomingGrid = document.getElementById('upcomingEventsGrid');
-    if (!upcomingGrid) return;
-    upcomingGrid.innerHTML = '';
+function renderEvents(events, eventMedia = []) {
+    const eventsContainer = document.getElementById('eventsContainer');
+    if (!eventsContainer) return;
+    eventsContainer.innerHTML = '';
 
-    if (!events || events.length === 0) {
-        upcomingGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 40px;">No events yet. Create your first event!</p>';
+    if ((!events || events.length === 0) && (!eventMedia || eventMedia.length === 0)) {
+        eventsContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 40px;">No event content yet.</p>';
         return;
     }
 
@@ -1073,7 +1114,40 @@ function renderEvents(events) {
             <span class="badge" style="background: var(--primary-color); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${event.eventType || event.type || 'Event'}</span>
             <button onclick="window.deleteEvent('${event.id}')" style="margin-top: 10px; padding: 8px 12px; background: #ff6b6b; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; width: 100%;">Delete</button>
         `;
-        upcomingGrid.appendChild(eventCard);
+        eventsContainer.appendChild(eventCard);
+    });
+
+    eventMedia.forEach((item) => {
+        const mediaCard = document.createElement('div');
+        mediaCard.className = 'event-card';
+        const titleText = item.fileName || item.filename || item.title || (item.type === 'video' ? 'Event Video' : 'Event Image');
+        const descriptionText = item.description || item.story || item.content || 'Event media uploaded by the admin team.';
+        const mediaUrl = item.type === 'video'
+            ? (item.fileURL || item.url || '')
+            : (item.compressedURL || item.fileURL || item.url || item.thumbnail || '');
+        const poster = item.thumbnailURL || item.thumbnail || item.compressedURL || '';
+        const dateText = item.uploadedAt?.seconds
+            ? new Date(item.uploadedAt.seconds * 1000).toLocaleDateString()
+            : (typeof item.uploadedAt === 'number' ? new Date(item.uploadedAt).toLocaleDateString() : 'Recent upload');
+
+        mediaCard.innerHTML = `
+            <div class="event-media">
+                ${item.type === 'video'
+                    ? (mediaUrl
+                        ? `<video src="${mediaUrl}" ${poster ? `poster="${poster}"` : ''} controls preload="metadata"></video>`
+                        : `<i class="fas fa-play-circle" style="font-size: 40px; color: #2e8b57;"></i>`)
+                    : (mediaUrl
+                        ? `<img src="${mediaUrl}" alt="${titleText}">`
+                        : `<i class="fas fa-image" style="font-size: 40px; color: #2e8b57;"></i>`)}
+            </div>
+            <div class="event-card-content">
+                <h3>${titleText}</h3>
+                <p><i class="fas fa-clock"></i> ${dateText}</p>
+                <p>${descriptionText}</p>
+                <span class="badge" style="background: var(--primary-color); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Event Media</span>
+            </div>
+        `;
+        eventsContainer.appendChild(mediaCard);
     });
 }
 
@@ -2017,6 +2091,10 @@ async function loadFeed() {
     }
 
     feedItems = dedupeMediaItems(feedItems).filter((item) => {
+        if (item.type !== 'post' && !shouldDisplayInCommunityFeed(item)) {
+            return false;
+        }
+
         if (item.type === 'image') {
             return Boolean(item.compressedURL || item.fileURL || item.url || item.thumbnail);
         }
@@ -2067,6 +2145,22 @@ function dedupeMediaItems(items) {
         seen.add(key);
         return true;
     });
+}
+
+function normalizeDestination(category = '') {
+    const value = String(category || '').trim().toLowerCase();
+    if (value === 'community-feed') return 'community-feed';
+    if (value === 'event') return 'event';
+    if (value === 'repository-notes') return 'repository-notes';
+    if (value === 'repository-videos') return 'repository-videos';
+    if (value === 'others') return 'others';
+    return value;
+}
+
+function shouldDisplayInCommunityFeed(item) {
+    const destination = normalizeDestination(item.category);
+    if (!destination) return true;
+    return destination === 'community-feed' || destination === 'others';
 }
 
 function createFeedCard(item) {
