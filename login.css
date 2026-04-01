@@ -132,6 +132,10 @@ label {
     color: var(--primary-color);
 }
 
+.input-icon-single {
+    right: 14px;
+}
+
 .password-toggle {
     position: absolute;
     right: 10px;
