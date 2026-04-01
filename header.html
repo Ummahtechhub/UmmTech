@@ -9,8 +9,8 @@
     </div>
     <div class="header-right">
         <nav class="header-links" aria-label="Secondary">
-            <button type="button" class="header-link-btn" data-scroll-target="aboutSection">About Us</button>
-            <button type="button" class="header-link-btn" data-scroll-target="contactSection">Contact Us</button>
+            <button type="button" class="header-link-btn" data-open-modal="about">About Us</button>
+            <button type="button" class="header-link-btn" data-open-modal="contact">Contact Us</button>
         </nav>
         <div class="profile-chip-wrap">
             <button type="button" id="profileChipToggle" class="profile-chip" aria-haspopup="menu" aria-expanded="false">
@@ -28,6 +28,18 @@
         </div>
     </div>
 </header>
+
+<div id="infoModalOverlay" class="info-modal-overlay" hidden>
+    <div class="info-modal-backdrop" id="infoModalBackdrop"></div>
+    <section class="info-modal" aria-modal="true" role="dialog" aria-labelledby="infoModalTitle">
+        <button type="button" class="info-modal-close" id="infoModalClose" aria-label="Close dialog">
+            <i class="fas fa-times"></i>
+        </button>
+        <span class="info-modal-kicker" id="infoModalKicker">Ummah TechHub</span>
+        <h2 id="infoModalTitle" hidden></h2>
+        <div id="infoModalBody" class="info-modal-body"></div>
+    </section>
+</div>
 
 <style>
 @keyframes fadeInUp {

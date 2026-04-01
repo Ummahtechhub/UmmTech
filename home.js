@@ -108,6 +108,33 @@ const projectIdeaTracks = [
     { title: "Cyber Security Project Ideas", href: "https://roadmap.sh/cyber-security/projects", iconClass: "fas fa-shield-alt", description: "Project ideas." },
     { title: "AI Engineer Project Ideas", href: "https://roadmap.sh/ai-engineer/projects", iconClass: "fas fa-robot", description: "Project ideas." }
 ];
+const infoModalContent = {
+    about: {
+        kicker: "Ummah TechHub",
+        title: "",
+        body: `
+            <p><strong>Ummah TechHub</strong> is a practical technology community where students learn, build, and grow through real digital skills.</p>
+            <p>We focus on hands-on learning in software, networking, cybersecurity, collaboration, innovation, and project development so members gain experience beyond the classroom.</p>
+            <p>Through mentorship, peer learning, events, and partnerships with academies such as <strong>Cisco Networking Academy</strong> and <strong>OPSWAT Academy</strong>, we help learners prepare for certification, teamwork, and industry readiness.</p>
+        `
+    },
+    contact: {
+        kicker: "Get In Touch",
+        title: "",
+        body: `
+            <p><strong>Email:</strong> <a href="mailto:ummahtechhub@gmail.com">ummahtechhub@gmail.com</a></p>
+            <p><strong>Location:</strong> Kajiado Umma Main Campus</p>
+            <p><strong>Socials:</strong> Follow Ummah TechHub on Instagram, Facebook, and X for updates, events, and community activities.</p>
+            <div class="info-contact-map">
+                <iframe
+                    title="Ummah TechHub Location Map"
+                    src="https://maps.google.com/maps?q=Kajiado%20Umma%20Main%20Campus&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        `
+    }
+};
 // Dashboard Initialization
 function initDashboard() {
     if (!currentUser) {
@@ -259,6 +286,12 @@ function initializeHeaderUtilities() {
     const chipToggle = document.getElementById('profileChipToggle');
     const chipMenu = document.getElementById('profileChipMenu');
     const headerLogoutBtn = document.getElementById('headerLogoutBtn');
+    const modalOverlay = document.getElementById('infoModalOverlay');
+    const modalBackdrop = document.getElementById('infoModalBackdrop');
+    const modalClose = document.getElementById('infoModalClose');
+    const modalKicker = document.getElementById('infoModalKicker');
+    const modalTitle = document.getElementById('infoModalTitle');
+    const modalBody = document.getElementById('infoModalBody');
 
     if (chipToggle && chipMenu && !chipToggle.dataset.bound) {
         chipToggle.dataset.bound = 'true';
@@ -294,34 +327,47 @@ function initializeHeaderUtilities() {
         });
     });
 
-    const navigateToSection = (targetId) => {
-        chipMenu?.classList.remove('open');
-        chipToggle?.setAttribute('aria-expanded', 'false');
-
-        const scrollToTarget = () => {
-            document.getElementById(targetId)?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        };
-
-        if (targetId === 'aboutSection') {
-            document.querySelector('.nav-btn[data-page="overview"]')?.click();
-            window.setTimeout(scrollToTarget, 180);
-            return;
-        }
-
-        scrollToTarget();
+    const closeModal = () => {
+        if (!modalOverlay) return;
+        modalOverlay.hidden = true;
+        document.body.classList.remove('modal-open');
     };
 
-    document.querySelectorAll('[data-scroll-target]').forEach((button) => {
+    const openModal = (key) => {
+        const content = infoModalContent[key];
+        if (!content || !modalOverlay || !modalKicker || !modalTitle || !modalBody) return;
+
+        chipMenu?.classList.remove('open');
+        chipToggle?.setAttribute('aria-expanded', 'false');
+        modalKicker.textContent = content.kicker;
+        modalTitle.textContent = content.title;
+        modalTitle.hidden = !content.title;
+        modalBody.innerHTML = content.body;
+        modalOverlay.hidden = false;
+        document.body.classList.add('modal-open');
+    };
+
+    document.querySelectorAll('[data-open-modal]').forEach((button) => {
         if (button.dataset.bound) return;
         button.dataset.bound = 'true';
-        button.addEventListener('click', () => navigateToSection(button.dataset.scrollTarget));
+        button.addEventListener('click', () => openModal(button.dataset.openModal));
     });
+
+    if (modalClose && !modalClose.dataset.bound) {
+        modalClose.dataset.bound = 'true';
+        modalClose.addEventListener('click', closeModal);
+    }
+
+    if (modalBackdrop && !modalBackdrop.dataset.bound) {
+        modalBackdrop.dataset.bound = 'true';
+        modalBackdrop.addEventListener('click', closeModal);
+    }
+
+    closeModal();
 
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') {
+            closeModal();
             chipMenu?.classList.remove('open');
             chipToggle?.setAttribute('aria-expanded', 'false');
         }
