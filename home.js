@@ -113,20 +113,71 @@ const infoModalContent = {
         kicker: 'About Us',
         title: 'About Ummah TechHub',
         body: `
-            <p><strong>Ummah TechHub</strong> is a student-centered innovation and learning community focused on practical technology growth, collaboration, and digital opportunity.</p>
-            <p>We create space for students to build projects, sharpen technical skills, join teams, and access industry-relevant learning through partnerships, events, and mentorship.</p>
-            <p>Our goal is to help learners move from interest to confidence through real exposure in software, networking, cybersecurity, teamwork, and certification pathways.</p>
+            <p><strong>Ummah TechHub</strong> is a practical technology community built to help students learn, build, collaborate, and grow with confidence in the digital world.</p>
+            <p>We create a space where learners can move beyond theory into <strong>real tech experience</strong> through projects, team collaboration, certification pathways, networking, cybersecurity exposure, and innovation-driven activities.</p>
+            <p>Our focus is to prepare students for modern opportunities in <strong>software development, networking, cybersecurity, digital problem solving, and industry readiness</strong> by connecting classroom potential with practical skill-building.</p>
+            <p>Through events, peer learning, mentorship, and collaborations with recognized academies such as <strong>Cisco Networking Academy</strong> and <strong>OPSWAT Academy</strong>, Ummah TechHub continues to build a culture of curiosity, discipline, creativity, and technical excellence.</p>
+            <div class="info-modal-highlight-grid">
+                <div class="info-modal-highlight">
+                    <i class="fas fa-code"></i>
+                    <span>Project-Based Learning</span>
+                </div>
+                <div class="info-modal-highlight">
+                    <i class="fas fa-user-friends"></i>
+                    <span>Team Collaboration</span>
+                </div>
+                <div class="info-modal-highlight">
+                    <i class="fas fa-certificate"></i>
+                    <span>Certification Pathways</span>
+                </div>
+                <div class="info-modal-highlight">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>Innovation Culture</span>
+                </div>
+            </div>
         `
     },
     contact: {
         kicker: 'Contact Us',
         title: 'Contact Ummah TechHub',
         body: `
-            <p><strong>Email:</strong> ummahtechhub@gmail.com</p>
-            <p><strong>Instagram:</strong> @ummatechhub</p>
-            <p><strong>Facebook:</strong> Ummah TechHub</p>
-            <p><strong>X:</strong> @ummatechhub105</p>
-            <p>For collaborations, student opportunities, training, or community programs, reach out through our social platforms or email and we will get back to you.</p>
+            <div class="info-contact-grid">
+                <div class="info-contact-card">
+                    <div class="info-contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <strong>Email</strong>
+                            <a href="mailto:ummahtechhub@gmail.com">ummahtechhub@gmail.com</a>
+                        </div>
+                    </div>
+                    <div class="info-contact-item">
+                        <i class="fas fa-location-dot"></i>
+                        <div>
+                            <strong>Location</strong>
+                            <span>Kajiado Umma Main Campus</span>
+                        </div>
+                    </div>
+                    <div class="info-contact-item">
+                        <i class="fas fa-hashtag"></i>
+                        <div>
+                            <strong>Social Links</strong>
+                            <div class="info-contact-links">
+                                <a href="https://www.instagram.com/ummatechhub?igsh=MXN2bTRhdGFyYjR4dw%3D%3D&utm_source=qr" target="_blank" rel="noopener">Instagram</a>
+                                <a href="https://www.facebook.com/share/1HzkMNFqZB/?mibextid=wwXIfr" target="_blank" rel="noopener">Facebook</a>
+                                <a href="https://x.com/ummatechhub105?s=21" target="_blank" rel="noopener">X</a>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="info-contact-note">For collaborations, student programs, training opportunities, certification partnerships, or community engagement, reach out through email or our social platforms and we will respond as soon as possible.</p>
+                </div>
+                <div class="info-contact-map">
+                    <iframe
+                        title="Ummah TechHub Location Map"
+                        src="https://maps.google.com/maps?q=Kajiado%20Umma%20Main%20Campus&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
         `
     }
 };

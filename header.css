@@ -272,6 +272,97 @@
     color: var(--text-primary);
 }
 
+.info-modal-highlight-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.info-modal-highlight {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: rgba(46, 139, 87, 0.08);
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.info-modal-highlight i {
+    color: var(--primary-color);
+}
+
+.info-contact-grid {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 18px;
+    margin-top: 6px;
+}
+
+.info-contact-card,
+.info-contact-map {
+    border-radius: 20px;
+    overflow: hidden;
+    background: rgba(46, 139, 87, 0.06);
+    border: 1px solid rgba(46, 139, 87, 0.12);
+}
+
+.info-contact-card {
+    padding: 18px;
+}
+
+.info-contact-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(46, 139, 87, 0.1);
+}
+
+.info-contact-item:last-of-type {
+    border-bottom: none;
+}
+
+.info-contact-item i {
+    width: 18px;
+    color: var(--primary-color);
+    margin-top: 2px;
+}
+
+.info-contact-item strong,
+.info-contact-item span,
+.info-contact-item a {
+    display: block;
+}
+
+.info-contact-item a,
+.info-contact-links a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.info-contact-links {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+}
+
+.info-contact-note {
+    margin: 16px 0 0;
+    font-size: 14px;
+}
+
+.info-contact-map iframe {
+    width: 100%;
+    min-height: 320px;
+    border: 0;
+    display: block;
+}
+
 .site-header img[alt="Ummah TechHub Logo"] {
     width: 100px;
     height: 100px;
@@ -309,5 +400,20 @@
 
     .site-header .brand {
         font-size: 22px;
+    }
+}
+
+@media (max-width: 760px) {
+    .info-modal-highlight-grid,
+    .info-contact-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .info-modal {
+        padding: 24px 18px 20px;
+    }
+
+    .info-modal h2 {
+        font-size: 26px;
     }
 }
