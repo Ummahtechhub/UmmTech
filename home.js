@@ -35,6 +35,10 @@ const repositoryState = {
     search: '',
     sort: 'newest'
 };
+const roadmapState = {
+    search: '',
+    filter: 'all'
+};
 const roadmapTracks = [
     { title: "Frontend", href: "https://roadmap.sh/frontend", iconClass: "fas fa-laptop-code", description: "Role roadmap." },
     { title: "Backend", href: "https://roadmap.sh/backend", iconClass: "fas fa-server", description: "Role roadmap." },
@@ -222,6 +226,7 @@ function initDashboard() {
     initializeLogout();
     initializeHeaderUtilities();
     initializeQuickAccess();
+    initializeRoadmapExperience();
     renderRoadmapCards();
     initializeProfileForm();
     initializeSettingsForm();
@@ -745,61 +750,234 @@ function initializeQuickAccess() {
 
 function renderRoadmapCards() {
     const roadmapGrid = document.getElementById('roadmapGrid');
+    const roadmapFeaturedGrid = document.getElementById('roadmapFeaturedGrid');
+    const roadmapResultsLine = document.getElementById('roadmapResultsLine');
     if (!roadmapGrid) return;
 
     roadmapGrid.innerHTML = '';
+    if (roadmapFeaturedGrid) roadmapFeaturedGrid.innerHTML = '';
 
-    const allTracks = [...roadmapTracks, ...projectIdeaTracks];
-    const sections = [
-        {
-            title: 'Role-based Roadmaps',
-            matches: (track) => track.description === 'Role roadmap.'
-        },
-        {
-            title: 'Skill-based Roadmaps',
-            matches: (track) => track.description === 'Skill roadmap.'
-        },
-        {
-            title: 'Project Ideas',
-            matches: (track) => track.description === 'Project ideas.'
-        },
-        {
-            title: 'Best Practices',
-            matches: (track) => track.description === 'Best practices roadmap.'
-        }
-    ];
+    const featuredTitles = new Set(['Full Stack', 'Cyber Security', 'AI Engineer', 'Frontend', 'Data Analyst', 'DevOps']);
+    const allTracks = [...roadmapTracks, ...projectIdeaTracks].map((track) => ({ ...track, meta: getRoadmapMeta(track) }));
+    const filteredTracks = allTracks.filter((track) => {
+        const matchesFilter = roadmapState.filter === 'all' || track.meta.categoryKey === roadmapState.filter;
+        const searchable = `${track.title} ${track.description} ${track.meta.categoryLabel} ${track.meta.level} ${(track.meta.tags || []).join(' ')}`.toLowerCase();
+        const matchesSearch = !roadmapState.search || searchable.includes(roadmapState.search);
+        return matchesFilter && matchesSearch;
+    });
+    const sections = getRoadmapSections(filteredTracks);
+
+    if (roadmapResultsLine) {
+        roadmapResultsLine.textContent = `${filteredTracks.length} roadmap${filteredTracks.length === 1 ? '' : 's'} available`;
+    }
+
+    if (roadmapFeaturedGrid) {
+        const featuredTracks = filteredTracks.filter((track) => featuredTitles.has(track.title)).slice(0, 3);
+        roadmapFeaturedGrid.innerHTML = featuredTracks.length
+            ? featuredTracks.map((track) => createFeaturedRoadmapMarkup(track)).join('')
+            : '<p class="roadmap-empty-state">No featured roadmap matches your current search.</p>';
+    }
+
+    if (!filteredTracks.length) {
+        roadmapGrid.innerHTML = '<p class="roadmap-empty-state">No roadmap matches your search yet. Try another keyword or category.</p>';
+        return;
+    }
 
     sections.forEach((section) => {
-        const items = allTracks.filter(section.matches);
+        const items = section.items;
         if (!items.length) return;
 
         const sectionWrap = document.createElement('section');
         sectionWrap.className = 'roadmap-category';
-
-        const heading = document.createElement('h3');
-        heading.className = 'roadmap-category-title';
-        heading.textContent = section.title;
-        sectionWrap.appendChild(heading);
+        sectionWrap.innerHTML = `
+            <div class="roadmap-section-head">
+                <div>
+                    <span class="roadmap-section-kicker">${section.kicker}</span>
+                    <h3 class="roadmap-category-title">${section.title}</h3>
+                </div>
+                <p>${section.description}</p>
+            </div>
+        `;
 
         const grid = document.createElement('div');
         grid.className = 'roadmap-grid';
 
         items.forEach((track) => {
             const card = document.createElement('a');
-            card.className = 'roadmap-card';
+            card.className = `roadmap-card roadmap-card-${track.meta.tone}`;
             card.href = track.href;
             card.target = '_blank';
             card.rel = 'noopener noreferrer';
             card.innerHTML = `
-                <h3><i class="${track.iconClass}"></i> ${track.title}</h3>
-                <p>${track.description}</p>
-                <span>${section.title === 'Project Ideas' ? 'Explore Project Ideas' : `Open ${track.title} Roadmap`}</span>
+                <div class="roadmap-card-topline">
+                    <span class="roadmap-card-icon"><i class="${track.iconClass}"></i></span>
+                    <span class="roadmap-card-level">${track.meta.level}</span>
+                </div>
+                <h3>${track.title}</h3>
+                <p>${track.meta.summary}</p>
+                <div class="roadmap-card-meta">
+                    <span>${track.meta.categoryLabel}</span>
+                    <span>${track.meta.duration}</span>
+                </div>
+                <div class="roadmap-card-tags">
+                    ${track.meta.tags.slice(0, 3).map((tag) => `<span>${tag}</span>`).join('')}
+                </div>
+                <span>${track.meta.cta}</span>
             `;
             grid.appendChild(card);
         });
 
         sectionWrap.appendChild(grid);
         roadmapGrid.appendChild(sectionWrap);
+    });
+}
+
+function getRoadmapMeta(track) {
+    const title = String(track.title || '').toLowerCase();
+    const description = String(track.description || '');
+    let categoryKey = 'development';
+    let categoryLabel = 'Development';
+    let level = 'Beginner Friendly';
+    let duration = '4-8 weeks';
+    let tags = ['Learning Path'];
+    let summary = 'Build core understanding, practice with real tools, and grow through guided milestones.';
+    let cta = description === 'Project ideas.' ? 'Explore Project Ideas' : 'Start Learning';
+    let tone = 'development';
+
+    if (title.includes('ai') || title.includes('data')) {
+        categoryKey = 'data-ai';
+        categoryLabel = 'Data & AI';
+        level = 'Intermediate';
+        duration = '6-10 weeks';
+        tags = ['AI', 'Data', 'Analytics'];
+        summary = 'Strengthen data thinking, experimentation, and AI-focused implementation skills.';
+        tone = 'data-ai';
+    } else if (title.includes('cloud') || title.includes('aws') || title.includes('azure') || title.includes('google cloud') || title.includes('docker') || title.includes('kubernetes') || title.includes('terraform') || title.includes('devops') || title.includes('linux')) {
+        categoryKey = 'cloud-devops';
+        categoryLabel = 'Cloud & DevOps';
+        level = 'Intermediate';
+        duration = '5-9 weeks';
+        tags = ['Cloud', 'Automation', 'Infrastructure'];
+        summary = 'Learn deployment, infrastructure, operations, and the workflows that keep products running.';
+        tone = 'cloud-devops';
+    } else if (title.includes('design') || title.includes('ux') || title.includes('product')) {
+        categoryKey = 'design-product';
+        categoryLabel = 'Design & Product';
+        level = 'Beginner Friendly';
+        duration = '3-6 weeks';
+        tags = ['UX', 'Design', 'Product'];
+        summary = 'Improve user thinking, product clarity, and design systems that support better experiences.';
+        tone = 'design-product';
+    } else if (title.includes('security') || title.includes('red teaming')) {
+        categoryKey = 'security';
+        categoryLabel = 'Security';
+        level = 'Intermediate';
+        duration = '6-10 weeks';
+        tags = ['Security', 'Protection', 'Systems'];
+        summary = 'Develop practical security awareness, defensive thinking, and safer engineering habits.';
+        tone = 'security';
+    } else if (description === 'Project ideas.') {
+        categoryKey = 'project-ideas';
+        categoryLabel = 'Project Ideas';
+        level = 'Build & Practice';
+        duration = 'Flexible';
+        tags = ['Projects', 'Portfolio', 'Practice'];
+        summary = 'Choose practical build ideas that help you turn roadmap knowledge into visible work.';
+        cta = 'Explore Project Ideas';
+        tone = 'project-ideas';
+    }
+
+    if (title.includes('frontend') || title.includes('react') || title.includes('vue') || title.includes('angular') || title.includes('javascript') || title.includes('typescript') || title.includes('node') || title.includes('backend') || title.includes('full stack') || title.includes('java') || title.includes('python') || title.includes('go') || title.includes('rust') || title.includes('android') || title.includes('ios') || title.includes('flutter') || title.includes('react native') || title.includes('blockchain')) {
+        if (description !== 'Project ideas.') {
+            tags = ['Code', 'Apps', 'Engineering'];
+            summary = 'Follow a practical build path across tools, frameworks, and modern software skills.';
+        }
+    }
+
+    if (description === 'Best practices roadmap.') {
+        level = 'Professional';
+        duration = '2-4 weeks';
+        tags = ['Quality', 'Performance', 'Standards'];
+        summary = 'Sharpen your engineering quality through stronger practices, review habits, and system thinking.';
+        cta = 'Open Best Practices';
+    }
+
+    return { categoryKey, categoryLabel, level, duration, tags, summary, cta, tone };
+}
+
+function getRoadmapSections(tracks) {
+    const sectionMap = [
+        {
+            title: 'Role-based Roadmaps',
+            kicker: 'Career Paths',
+            description: 'Start with the broader roles that can shape your long-term direction in tech.',
+            matches: (track) => track.description === 'Role roadmap.'
+        },
+        {
+            title: 'Skill-based Roadmaps',
+            kicker: 'Core Skills',
+            description: 'Use focused skill tracks to strengthen one technical area at a time.',
+            matches: (track) => track.description === 'Skill roadmap.'
+        },
+        {
+            title: 'Project Ideas',
+            kicker: 'Build Practice',
+            description: 'Turn learning into portfolio work with guided project idea collections.',
+            matches: (track) => track.description === 'Project ideas.'
+        },
+        {
+            title: 'Best Practices',
+            kicker: 'Professional Growth',
+            description: 'Improve code quality, performance, and engineering standards as you grow.',
+            matches: (track) => track.description === 'Best practices roadmap.'
+        }
+    ];
+
+    return sectionMap.map((section) => ({
+        ...section,
+        items: tracks.filter(section.matches)
+    }));
+}
+
+function createFeaturedRoadmapMarkup(track) {
+    return `
+        <a class="roadmap-featured-card roadmap-card-${track.meta.tone}" href="${track.href}" target="_blank" rel="noopener noreferrer">
+            <div class="roadmap-featured-icon"><i class="${track.iconClass}"></i></div>
+            <div class="roadmap-featured-copy">
+                <span class="roadmap-featured-kicker">${track.meta.categoryLabel}</span>
+                <h4>${track.title}</h4>
+                <p>${track.meta.summary}</p>
+            </div>
+            <div class="roadmap-featured-meta">
+                <span>${track.meta.level}</span>
+                <span>${track.meta.duration}</span>
+            </div>
+        </a>
+    `;
+}
+
+function initializeRoadmapExperience() {
+    const searchInput = document.getElementById('roadmapSearchInput');
+    const filterChips = document.querySelectorAll('[data-roadmap-filter]');
+
+    if (searchInput && !searchInput.dataset.bound) {
+        searchInput.dataset.bound = 'true';
+        searchInput.addEventListener('input', (event) => {
+            roadmapState.search = String(event.target.value || '').trim().toLowerCase();
+            renderRoadmapCards();
+        });
+    }
+
+    filterChips.forEach((chip) => {
+        if (chip.dataset.bound) return;
+        chip.dataset.bound = 'true';
+        chip.addEventListener('click', () => {
+            roadmapState.filter = chip.dataset.roadmapFilter || 'all';
+            document.querySelectorAll('[data-roadmap-filter]').forEach((button) => {
+                button.classList.toggle('active', button === chip);
+            });
+            renderRoadmapCards();
+        });
     });
 }
 
@@ -2174,15 +2352,7 @@ function dedupeMediaItems(items) {
     const seen = new Set();
 
     return items.filter((item) => {
-        const mediaUrl = item.compressedURL || item.fileURL || item.url || item.thumbnailURL || item.thumbnail || '';
-        const name = item.fileName || item.filename || item.title || item.name || '';
-        const stamp = item.uploadedAt?.seconds || item.createdAt || item.createdDate || '';
-        const key = [
-            item.type || 'item',
-            String(mediaUrl).trim().toLowerCase(),
-            String(name).trim().toLowerCase(),
-            String(stamp).trim().toLowerCase()
-        ].join('|');
+        const key = getUploadIdentityKey(item);
 
         if (seen.has(key)) {
             return false;
@@ -2191,6 +2361,41 @@ function dedupeMediaItems(items) {
         seen.add(key);
         return true;
     });
+}
+
+function getUploadIdentityKey(item) {
+    const type = item.type || 'item';
+    const uploadId = item.uploadId ? `${type}|upload|${String(item.uploadId).trim().toLowerCase()}` : '';
+    if (uploadId) return uploadId;
+
+    const storagePath = item.storagePath ? `${type}|storage|${String(item.storagePath).trim().toLowerCase()}` : '';
+    if (storagePath) return storagePath;
+
+    const batchKey = item.batchId
+        ? [
+            type,
+            'batch',
+            String(item.batchId).trim().toLowerCase(),
+            String(item.batchIndex ?? '').trim().toLowerCase()
+        ].join('|')
+        : '';
+    if (batchKey) return batchKey;
+
+    const mediaUrl = item.compressedURL || item.fileURL || item.url || item.thumbnailURL || item.thumbnail || '';
+    const name = item.fileName || item.filename || item.title || item.name || '';
+    const fallbackParts = [
+        type,
+        String(mediaUrl).trim().toLowerCase(),
+        String(name).trim().toLowerCase()
+    ];
+
+    if (mediaUrl) {
+        return fallbackParts.join('|');
+    }
+
+    const stamp = item.uploadedAt?.seconds || item.uploadedAt || item.createdAt || item.createdDate || '';
+    fallbackParts.push(String(stamp).trim().toLowerCase());
+    return fallbackParts.join('|');
 }
 
 function getUploadTimestamp(item) {

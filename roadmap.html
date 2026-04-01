@@ -9,11 +9,56 @@
     <div class="content-hero roadmap-hero" style="background-image: linear-gradient(120deg, rgba(6, 63, 47, 0.9), rgba(46, 139, 87, 0.7)), url('https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1400&q=80');">
         <div class="roadmap-hero-content">
             <h2 class="animated-title glow-title">Study Roadmaps</h2>
-            <p>Pick a track of your choice and become an expert in that field.</p>
+            <p>Explore guided paths, practical skills, and project ideas that can help you move from interest to confidence in tech.</p>
+        </div>
+        <div class="roadmap-hero-panel">
+            <div class="roadmap-hero-stat">
+                <strong>70+</strong>
+                <span>Learning paths</span>
+            </div>
+            <div class="roadmap-hero-stat">
+                <strong>6</strong>
+                <span>Focus areas</span>
+            </div>
+            <div class="roadmap-hero-stat">
+                <strong>Start</strong>
+                <span>From beginner level</span>
+            </div>
         </div>
     </div>
 
     <div class="content-section roadmap-section">
+        <section class="roadmap-toolbar">
+            <div class="roadmap-search-wrap">
+                <i class="fas fa-search" aria-hidden="true"></i>
+                <input id="roadmapSearchInput" type="search" placeholder="Search by roadmap, skill, or stack">
+            </div>
+            <div class="roadmap-filter-chips" id="roadmapFilterChips">
+                <button type="button" class="roadmap-filter-chip active" data-roadmap-filter="all">All</button>
+                <button type="button" class="roadmap-filter-chip" data-roadmap-filter="development">Development</button>
+                <button type="button" class="roadmap-filter-chip" data-roadmap-filter="data-ai">Data & AI</button>
+                <button type="button" class="roadmap-filter-chip" data-roadmap-filter="cloud-devops">Cloud & DevOps</button>
+                <button type="button" class="roadmap-filter-chip" data-roadmap-filter="design-product">Design & Product</button>
+                <button type="button" class="roadmap-filter-chip" data-roadmap-filter="security">Security</button>
+                <button type="button" class="roadmap-filter-chip" data-roadmap-filter="project-ideas">Project Ideas</button>
+            </div>
+        </section>
+
+        <section class="roadmap-featured-section">
+            <div class="roadmap-section-head">
+                <div>
+                    <span class="roadmap-section-kicker">Recommended Start</span>
+                    <h3>Featured learning paths</h3>
+                </div>
+                <p>These are strong starting points for members who want clear direction and practical growth.</p>
+            </div>
+            <div class="roadmap-featured-grid" id="roadmapFeaturedGrid">
+                <p style="color: var(--text-secondary);">Loading featured tracks...</p>
+            </div>
+        </section>
+
+        <div class="roadmap-results-line" id="roadmapResultsLine">Loading roadmap tracks...</div>
+
         <div class="roadmap-groups" id="roadmapGrid">
             <p style="color: var(--text-secondary);">Loading roadmap tracks...</p>
         </div>
