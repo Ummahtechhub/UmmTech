@@ -101,7 +101,8 @@ window.addEventListener("resize", () => {
     }
 });
 
-const MAX_UPLOAD_BYTES = 1 * 1024 * 1024;
+const MAX_FILE_UPLOAD_BYTES = 10 * 1024 * 1024;
+const MAX_VIDEO_UPLOAD_BYTES = 50 * 1024 * 1024;
 const IMAGE_QUALITY_START = 0.7;
 const IMAGE_MIN_QUALITY = 0.3;
 const IMAGE_MAX_WIDTH = 1280;
@@ -112,6 +113,16 @@ const IMAGE_RTDB_MAX_BYTES = 680 * 1024; // keep base64 safely under ~1MB
 const VIDEO_THUMB_MAX_BYTES = 200 * 1024;
 const IMAGE_UPLOAD_CONCURRENCY = 3;
 const DEFAULT_UPLOAD_CONCURRENCY = 3;
+
+function getUploadLimitBytes(type) {
+    if (type === "videos") return MAX_VIDEO_UPLOAD_BYTES;
+    if (type === "files") return MAX_FILE_UPLOAD_BYTES;
+    return 0;
+}
+
+function formatBytesToMb(bytes) {
+    return `${Math.round((bytes / (1024 * 1024)) * 10) / 10}MB`;
+}
 
 function readFileAsDataURL(file) {
     return new Promise((resolve, reject) => {
@@ -305,8 +316,9 @@ async function uploadFiles(files, category, story, type, options = {}) {
         const timestamp = Date.now();
         const uploadId = `${type}-${timestamp}-${Math.random().toString(36).slice(2, 8)}`;
 
-        if (type !== "images" && file.size > MAX_UPLOAD_BYTES) {
-            throw new Error(`File "${file.name}" exceeds 1MB. Please upload smaller files.`);
+        const uploadLimit = getUploadLimitBytes(type);
+        if (uploadLimit && file.size > uploadLimit) {
+            throw new Error(`File "${file.name}" exceeds ${formatBytesToMb(uploadLimit)}. Please upload a smaller file.`);
         }
 
         if (type === "videos" && file.type.startsWith("video/")) {
