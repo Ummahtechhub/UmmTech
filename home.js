@@ -170,6 +170,7 @@ function initDashboard() {
     loadFeed();
     updateStats();
     initOverviewBackground();
+    setCertificationCounts();
 }
 
 onAuthStateChanged(auth, async (user) => {
@@ -189,6 +190,45 @@ onAuthStateChanged(auth, async (user) => {
     await migrateLocalStorageToFirestore();
     initDashboard();
 });
+
+function setCertificationCounts() {
+    document.querySelectorAll('.certification-value[data-count-target]').forEach((element) => {
+        element.textContent = '0+';
+    });
+}
+
+function animateCertificationCounts() {
+    const counters = document.querySelectorAll('.certification-value[data-count-target]');
+    if (!counters.length) return;
+
+    if (window._certificationAnimationFrame) {
+        cancelAnimationFrame(window._certificationAnimationFrame);
+    }
+
+    counters.forEach((element) => {
+        element.textContent = '0+';
+    });
+
+    const duration = 1400;
+    const start = performance.now();
+
+    const tick = (now) => {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+
+        counters.forEach((element) => {
+            const target = Number(element.dataset.countTarget || 0);
+            const value = Math.round(target * eased);
+            element.textContent = `${value}+`;
+        });
+
+        if (progress < 1) {
+            window._certificationAnimationFrame = requestAnimationFrame(tick);
+        }
+    };
+
+    window._certificationAnimationFrame = requestAnimationFrame(tick);
+}
 
 async function migrateLocalStorageToFirestore() {
     if (!currentUser) return;
@@ -446,6 +486,7 @@ function initializeNavigation() {
 
             if (page === 'overview') {
                 updateStats();
+                animateCertificationCounts();
             }
 
             // Close sidebar on mobile
