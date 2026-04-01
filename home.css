@@ -2347,6 +2347,40 @@ body.theme-dark .nav-btn:hover {
     gap: 16px;
 }
 
+.repository-drive-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 16px;
+    align-items: center;
+    padding: 20px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(46, 139, 87, 0.08), rgba(102, 205, 170, 0.05));
+    border: 1px solid rgba(46, 139, 87, 0.16);
+}
+
+.repository-drive-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.78);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #0f9d58;
+    font-size: 28px;
+}
+
+.repository-drive-copy h4 {
+    color: var(--text-primary);
+    margin: 0 0 8px;
+}
+
+.repository-drive-copy p {
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
 .repository-resource-card {
     background: rgba(255, 255, 255, 0.94);
     border: 1px solid rgba(46, 139, 87, 0.16);
@@ -2631,6 +2665,7 @@ body.theme-dark .nav-btn:hover {
         align-items: stretch;
     }
 
+    .repository-drive-card,
     .repository-stats,
     .repository-grid,
     .repo-showcase-grid {

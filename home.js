@@ -1520,30 +1520,24 @@ async function loadRepository() {
     initializeRepositoryControls();
 
     const filesGrid = document.getElementById('repositoryFilesGrid');
-    const imagesGrid = document.getElementById('repositoryImagesGrid');
     const videosGrid = document.getElementById('repositoryVideosGrid');
-    if (!filesGrid || !videosGrid || !imagesGrid) return;
+    if (!filesGrid || !videosGrid) return;
 
     filesGrid.innerHTML = '<p class="repository-empty-state">Loading repository files...</p>';
-    imagesGrid.innerHTML = '<p class="repository-empty-state">Loading repository images...</p>';
     videosGrid.innerHTML = '<p class="repository-empty-state">Loading repository videos...</p>';
 
     let files = [];
-    let images = [];
     let videos = [];
 
     try {
         const filesQuery = query(collection(db, 'files'), orderBy('uploadedAt', 'desc'));
-        const imagesQuery = query(collection(db, 'images'), orderBy('uploadedAt', 'desc'));
         const videosQuery = query(collection(db, 'videos'), orderBy('uploadedAt', 'desc'));
-        const [filesSnap, imagesSnap, videosSnap] = await Promise.all([
+        const [filesSnap, videosSnap] = await Promise.all([
             getDocs(filesQuery),
-            getDocs(imagesQuery),
             getDocs(videosQuery)
         ]);
 
         files = filesSnap.docs.map((docSnap) => ({ id: docSnap.id, __source: 'firestore', ...docSnap.data() }));
-        images = imagesSnap.docs.map((docSnap) => ({ id: docSnap.id, __source: 'firestore', ...docSnap.data() }));
         videos = videosSnap.docs.map((docSnap) => ({ id: docSnap.id, __source: 'firestore', ...docSnap.data() }));
     } catch (e) {
         console.error('Repository load failed:', e);
@@ -1554,20 +1548,18 @@ async function loadRepository() {
         if (uploadsSnap.exists()) {
             const uploads = uploadsSnap.val() || {};
             const rtdbFiles = uploads.files ? Object.values(uploads.files).map((item) => ({ ...item, __source: 'rtdb' })) : [];
-            const rtdbImages = uploads.images ? Object.values(uploads.images).map((item) => ({ ...item, __source: 'rtdb' })) : [];
             const rtdbVideos = uploads.videos ? Object.values(uploads.videos).map((item) => ({ ...item, __source: 'rtdb' })) : [];
             if (rtdbFiles.length) files = [...rtdbFiles, ...files];
-            if (rtdbImages.length) images = [...rtdbImages, ...images];
             if (rtdbVideos.length) videos = [...rtdbVideos, ...videos];
         }
     } catch (e) {
         console.error('Repository realtime load failed:', e);
     }
 
-    repositoryState.files = dedupeMediaItems(files).filter((item) => Boolean(item.fileURL || item.url));
-    repositoryState.images = dedupeMediaItems(images).filter((item) => Boolean(item.compressedURL || item.fileURL || item.url));
-    repositoryState.videos = dedupeMediaItems(videos).filter((item) => Boolean(item.fileURL || item.url || item.thumbnailURL || item.thumbnail || item.compressedURL));
     repositoryState.highlights = await loadRepositoryHighlights();
+    repositoryState.files = dedupeMediaItems(files).filter((item) => Boolean(item.fileURL || item.url));
+    repositoryState.images = [];
+    repositoryState.videos = dedupeMediaItems(videos).filter((item) => Boolean(item.fileURL || item.url || item.thumbnailURL || item.thumbnail || item.compressedURL));
 
     updateRepositoryCounts();
     renderRepository();
@@ -1597,7 +1589,6 @@ function updateRepositoryCounts() {
 function renderRepository() {
     renderRepositoryHighlights();
     renderRepositorySection('files', repositoryState.files, document.getElementById('repositoryFilesGrid'), 'file');
-    renderRepositorySection('images', repositoryState.images, document.getElementById('repositoryImagesGrid'), 'image');
     renderRepositorySection('videos', repositoryState.videos, document.getElementById('repositoryVideosGrid'), 'video');
     updateRepositoryVisibility();
     updateRepositoryResultsLine();
