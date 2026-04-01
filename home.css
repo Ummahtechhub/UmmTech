@@ -696,7 +696,7 @@ body.sidebar-open .main-content {
 
 .certification-band {
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
     align-items: center;
     gap: 18px;
     background: linear-gradient(135deg, #55b52d, #4b9f2a);
