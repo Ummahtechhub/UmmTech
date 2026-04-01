@@ -1,7 +1,9 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="icon" type="image/png" href="https://i.ibb.co/q3CnWYsb/logoumma.jpg">
+    <link rel="icon" href="https://i.ibb.co/q3CnWYsb/logoumma.jpg">
+    <link rel="shortcut icon" href="https://i.ibb.co/q3CnWYsb/logoumma.jpg">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/q3CnWYsb/logoumma.jpg">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ummah TechHub </title>
@@ -15,7 +17,7 @@
     <link rel="stylesheet" href="responsive.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
+<body data-default-page="feed" data-exclude-sections="roadmap-placeholder">
 
     <div class="dashboard-container">
         <div id="header-placeholder" style="display: block;"></div>
@@ -27,61 +29,12 @@
             <div id="projects-placeholder" style="display: none;"></div>
             <div id="teams-placeholder" style="display: none;"></div>
             <div id="repository-placeholder" style="display: none;"></div>
-            <div id="roadmap-placeholder" style="display: none;"></div>
             <div id="profile-placeholder" style="display: none;"></div>
             <div id="settings-placeholder" style="display: none;"></div>
         </main>
         <div id="footer-placeholder" style="display: block;"></div>
     </div>
 
-    <script>
-        // Function to load HTML content into placeholders
-        async function loadHTML(url, placeholderId) {
-            try {
-                const response = await fetch(url);
-                const html = await response.text();
-                document.getElementById(placeholderId).innerHTML = html;
-            } catch (error) {
-                console.error('Error loading HTML:', error);
-            }
-        }
-
-        // Load all sections in order
-        async function loadAll() {
-            await loadHTML('header.html', 'header-placeholder');
-            await loadHTML('sidebar.html', 'sidebar-placeholder');
-            await loadHTML('overview.html', 'overview-placeholder');
-            await loadHTML('feed.html', 'feed-placeholder');
-            await loadHTML('events.html', 'events-placeholder');
-            await loadHTML('projects.html', 'projects-placeholder');
-            await loadHTML('teams.html', 'teams-placeholder');
-            await loadHTML('repository.html', 'repository-placeholder');
-            await loadHTML('roadmap.html', 'roadmap-placeholder');
-            await loadHTML('profile.html', 'profile-placeholder');
-            await loadHTML('settings.html', 'settings-placeholder');
-            await loadHTML('footer.html', 'footer-placeholder');
-
-            // Now load the JS after HTML is loaded
-            const script = document.createElement('script');
-            script.type = 'module';
-            script.src = 'home.js';
-            script.onload = function() {
-                // Initialize navigation after JS is loaded
-                if (window.initializeNavigation) {
-                    window.initializeNavigation();
-                }
-                // Set feed as default active page
-                setTimeout(() => {
-                    const feedBtn = document.querySelector('.nav-btn[data-page="feed"]');
-                    if (feedBtn) {
-                        feedBtn.click();
-                    }
-                }, 200);
-            };
-            document.body.appendChild(script);
-        }
-
-        loadAll();
-    </script>
+    <script src="dashboard-loader.js"></script>
 </body>
 </html>
