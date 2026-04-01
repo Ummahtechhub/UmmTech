@@ -629,6 +629,18 @@ body.sidebar-open .main-content {
     backdrop-filter: blur(10px);
 }
 
+.partner-card-link {
+    display: block;
+    text-decoration: none;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.partner-card-link:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255, 255, 255, 0.26);
+    box-shadow: 0 18px 28px rgba(8, 28, 18, 0.16);
+}
+
 .partner-brand {
     display: block;
     margin-bottom: 16px;
@@ -2241,15 +2253,15 @@ body.theme-dark .nav-btn:hover {
 
 #feedContainer {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 14px;
     align-items: start;
-    justify-items: center;
+    justify-items: stretch;
 }
 
 .feed-card {
     width: 100%;
-    max-width: 360px;
+    max-width: none;
     border-radius: 18px;
     overflow: hidden;
     background: var(--card-bg);
@@ -2257,13 +2269,19 @@ body.theme-dark .nav-btn:hover {
     box-shadow: 0 12px 24px rgba(12, 35, 22, 0.08);
 }
 
-@media (min-width: 1180px) {
+@media (min-width: 980px) {
     #feedContainer {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 
-@media (max-width: 760px) {
+@media (min-width: 520px) and (max-width: 979px) {
+    #feedContainer {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 519px) {
     #feedContainer {
         grid-template-columns: 1fr;
     }
