@@ -1119,8 +1119,8 @@ function renderEvents(events, eventMedia = []) {
 
     eventMedia.forEach((item) => {
         const mediaCard = document.createElement('div');
-        mediaCard.className = 'event-card';
-        const titleText = item.fileName || item.filename || item.title || (item.type === 'video' ? 'Event Video' : 'Event Image');
+        mediaCard.className = 'event-card event-feed-card';
+        const titleText = formatUploadTitle(item.fileName || item.filename || item.title || item.name, item.type === 'video' ? 'Event Video' : 'Event Image');
         const descriptionText = item.description || item.story || item.content || 'Event media uploaded by the admin team.';
         const mediaUrl = item.type === 'video'
             ? (item.fileURL || item.url || '')
@@ -1137,7 +1137,7 @@ function renderEvents(events, eventMedia = []) {
                         ? `<video src="${mediaUrl}" ${poster ? `poster="${poster}"` : ''} controls preload="metadata"></video>`
                         : `<i class="fas fa-play-circle" style="font-size: 40px; color: #2e8b57;"></i>`)
                     : (mediaUrl
-                        ? `<img src="${mediaUrl}" alt="${titleText}">`
+                        ? `<button type="button" class="feed-media-open" onclick="window.openFeedMedia('${mediaUrl}', '${titleText.replace(/'/g, "\\'")}')"><img src="${mediaUrl}" alt="${titleText}"></button>`
                         : `<i class="fas fa-image" style="font-size: 40px; color: #2e8b57;"></i>`)}
             </div>
             <div class="event-card-content">
@@ -1145,6 +1145,20 @@ function renderEvents(events, eventMedia = []) {
                 <p><i class="fas fa-clock"></i> ${dateText}</p>
                 <p>${descriptionText}</p>
                 <span class="badge" style="background: var(--primary-color); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Event Media</span>
+                <div class="upload-card-actions" style="margin-top: 12px;">
+                    <button class="feed-action-btn upload-card-action-btn">
+                        <i class="fas fa-thumbs-up"></i>
+                        <span>Like</span>
+                    </button>
+                    <button class="feed-action-btn upload-card-action-btn">
+                        <i class="fas fa-share"></i>
+                        <span>Share</span>
+                    </button>
+                    <button class="feed-action-btn upload-card-action-btn">
+                        <i class="fas fa-comment"></i>
+                        <span>Comment</span>
+                    </button>
+                </div>
             </div>
         `;
         eventsContainer.appendChild(mediaCard);
@@ -1813,7 +1827,7 @@ function updateRepositoryResultsLine() {
 }
 
 function getRepositoryTitle(item, kind) {
-    return item.title || item.fileName || item.filename || item.name || (kind === 'file' ? 'Resource File' : kind === 'image' ? 'Gallery Image' : 'Video Resource');
+    return formatUploadTitle(item.title || item.fileName || item.filename || item.name, kind === 'file' ? 'Resource File' : kind === 'image' ? 'Gallery Image' : 'Video Resource');
 }
 
 function getRepositoryDescription(item) {
@@ -1836,6 +1850,29 @@ function getRepositoryTimestamp(item) {
 function getRepositoryDate(item) {
     const timestamp = getRepositoryTimestamp(item);
     return timestamp ? new Date(timestamp).toLocaleDateString() : 'Recent upload';
+}
+
+function formatUploadTitle(rawTitle, fallback = 'Upload') {
+    const source = String(rawTitle || '').trim();
+    if (!source) return fallback;
+
+    const withoutExtension = source.replace(/\.[a-z0-9]+$/i, '');
+    const normalized = withoutExtension
+        .replace(/[_-]+/g, ' ')
+        .replace(/\bwhatsapp image\b/ig, '')
+        .replace(/\bat\b/ig, ' ')
+        .replace(/\bpm\b|\bam\b/ig, ' ')
+        .replace(/\b\d{4}\b/g, ' ')
+        .replace(/\b\d{1,2}\b/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    if (!normalized) return fallback;
+
+    return normalized
+        .split(' ')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
 }
 
 function getFileIconClass(url = '') {
@@ -2170,7 +2207,7 @@ function createFeedCard(item) {
     
     const itemKey = String(item.id || item.fileURL || item.url || item.thumbnail || item.title || item.fileName || item.filename || item.createdAt || item.uploadedAt?.seconds || Math.random());
     const itemId = itemKey.replace(/[^a-zA-Z0-9_-]/g, '_');
-    const titleText = item.title || item.fileName || item.filename || item.name || 'Post';
+    const titleText = formatUploadTitle(item.title || item.fileName || item.filename || item.name, 'Post');
     const descriptionText = item.description || item.story || item.content || '';
     const shortDesc = descriptionText || 'No description provided.';
     const createdDate = item.createdDate
@@ -2229,16 +2266,16 @@ function createFeedCard(item) {
 
     card.innerHTML = `
         ${content}
-        <div style="padding: 15px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; flex-wrap: wrap; gap: 10px;">
-            <button onclick="window.toggleLike('${itemId}')" class="feed-action-btn" style="flex: 1; min-width: 80px; padding: 10px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 6px; transition: all 0.3s ease;">
+        <div class="upload-card-actions">
+            <button onclick="window.toggleLike('${itemId}')" class="feed-action-btn upload-card-action-btn">
                 <i class="fas fa-thumbs-up"></i>
                 <span>Like (<span class="like-count-${itemId}">${likesCount}</span>)</span>
             </button>
-            <button onclick="window.toggleShare('${itemId}')" class="feed-action-btn" style="flex: 1; min-width: 80px; padding: 10px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 6px; transition: all 0.3s ease;">
+            <button onclick="window.toggleShare('${itemId}')" class="feed-action-btn upload-card-action-btn">
                 <i class="fas fa-share"></i>
                 <span>Share (<span class="share-count-${itemId}">${sharesCount}</span>)</span>
             </button>
-            <button onclick="window.toggleComment('${itemId}')" class="feed-action-btn" style="flex: 1; min-width: 80px; padding: 10px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 6px; transition: all 0.3s ease;">
+            <button onclick="window.toggleComment('${itemId}')" class="feed-action-btn upload-card-action-btn">
                 <i class="fas fa-comment"></i>
                 <span>Comment (<span class="comment-count-${itemId}">${commentsCount}</span>)</span>
             </button>

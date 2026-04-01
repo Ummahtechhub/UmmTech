@@ -940,7 +940,7 @@ body {
     max-height: 220px;
     height: auto;
     object-fit: contain;
-    background: #f7f7f7;
+    background: transparent;
     border-radius: 8px;
 }
 
@@ -954,6 +954,47 @@ body {
     font-size: 13px;
     color: var(--text-secondary);
     margin-bottom: 8px;
+}
+
+.events-feed-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+    align-items: start;
+    justify-items: center;
+}
+
+.event-feed-card {
+    width: 100%;
+    max-width: 360px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(255, 248, 238, 0.94);
+    border: 1px solid rgba(46, 139, 87, 0.14);
+    box-shadow: 0 10px 20px rgba(12, 35, 22, 0.06);
+}
+
+.event-feed-card .event-card-content {
+    padding: 12px 14px 14px;
+}
+
+.event-feed-card .event-media {
+    min-height: 200px;
+    max-height: 300px;
+    border-radius: 0;
+    background: transparent;
+    padding: 0;
+}
+
+.event-feed-card .event-media img,
+.event-feed-card .event-media video {
+    width: auto;
+    max-width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    background: transparent;
+    border-radius: 0;
+    margin: 0 auto;
 }
 
 .badge {
@@ -1107,13 +1148,13 @@ body {
     border-radius: 12px 12px 0 0;
     overflow: hidden;
     margin-bottom: 0;
-    background: #f3f5f7;
+    background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
     min-height: 0;
-    border-bottom: 1px solid rgba(46, 139, 87, 0.12);
+    border-bottom: 1px solid rgba(46, 139, 87, 0.08);
 }
 
 .upload-media-image {
@@ -1129,7 +1170,7 @@ body {
     height: auto;
     max-height: 240px;
     object-fit: contain;
-    background: #f3f5f7;
+    background: transparent;
     border-radius: 0;
     display: block;
 }
@@ -2344,7 +2385,7 @@ body.theme-dark .nav-btn:hover {
 .repository-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 16px;
+    gap: 12px;
 }
 
 .repository-drive-card {
@@ -2382,11 +2423,11 @@ body.theme-dark .nav-btn:hover {
 }
 
 .repository-resource-card {
-    background: rgba(255, 255, 255, 0.94);
+    background: rgba(255, 248, 238, 0.94);
     border: 1px solid rgba(46, 139, 87, 0.16);
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 10px 22px rgba(12, 35, 22, 0.06);
+    box-shadow: 0 10px 20px rgba(12, 35, 22, 0.06);
     display: flex;
     flex-direction: column;
 }
@@ -2698,20 +2739,20 @@ body.theme-dark .nav-btn:hover {
 .feed-card-media-shell {
     width: 100%;
     background: transparent;
-    border-bottom: 1px solid rgba(46, 139, 87, 0.12);
+    border-bottom: 1px solid rgba(46, 139, 87, 0.08);
     overflow: hidden;
     padding: 0;
 }
 
 .feed-card-media-stage {
     width: 100%;
-    min-height: 220px;
-    max-height: 320px;
+    min-height: 200px;
+    max-height: 300px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(16, 26, 19, 0.05);
-    border-radius: 16px;
+    background: transparent;
+    border-radius: 0;
     overflow: hidden;
 }
 
@@ -2727,7 +2768,7 @@ body.theme-dark .nav-btn:hover {
 }
 
 .feed-card-body {
-    padding: 14px 16px 16px;
+    padding: 12px 14px 14px;
 }
 
 .feed-card-body h3 {
@@ -2758,7 +2799,7 @@ body.theme-dark .nav-btn:hover {
 #feedContainer {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap: 14px;
+    gap: 12px;
     align-items: start;
     justify-items: stretch;
 }
@@ -2766,11 +2807,36 @@ body.theme-dark .nav-btn:hover {
 .feed-card {
     width: 100%;
     max-width: none;
-    border-radius: 18px;
+    border-radius: 16px;
     overflow: hidden;
-    background: var(--card-bg);
+    background: rgba(255, 248, 238, 0.94);
     border: 1px solid rgba(46, 139, 87, 0.14);
-    box-shadow: 0 12px 24px rgba(12, 35, 22, 0.08);
+    box-shadow: 0 10px 20px rgba(12, 35, 22, 0.06);
+}
+
+.upload-card-actions {
+    padding: 10px 12px;
+    border-top: 1px solid rgba(46, 139, 87, 0.08);
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.upload-card-action-btn {
+    flex: 1;
+    min-width: 80px;
+    padding: 8px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
 }
 
 @media (min-width: 980px) {
