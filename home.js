@@ -1497,6 +1497,9 @@ async function loadRepository() {
         console.error('Repository realtime load failed:', e);
     }
 
+    images = dedupeMediaItems(images).filter((item) => Boolean(item.compressedURL || item.fileURL || item.url));
+    videos = dedupeMediaItems(videos).filter((item) => Boolean(item.fileURL || item.url || item.thumbnailURL || item.thumbnail || item.compressedURL));
+
     filesGrid.innerHTML = '';
     imagesGrid.innerHTML = '';
     videosGrid.innerHTML = '';
@@ -1672,6 +1675,18 @@ async function loadFeed() {
         console.error('Feed realtime load failed:', e);
     }
 
+    feedItems = dedupeMediaItems(feedItems).filter((item) => {
+        if (item.type === 'image') {
+            return Boolean(item.compressedURL || item.fileURL || item.url || item.thumbnail);
+        }
+
+        if (item.type === 'video') {
+            return Boolean(item.fileURL || item.url || item.thumbnailURL || item.thumbnail || item.compressedURL);
+        }
+
+        return true;
+    });
+
     // Sort by most recent
     feedItems.sort((a, b) => {
         const dateA = a.uploadedAt?.seconds ? a.uploadedAt.seconds * 1000 : (a.id || 0);
@@ -1687,6 +1702,29 @@ async function loadFeed() {
     feedItems.forEach(item => {
         const feedCard = createFeedCard(item);
         feedContainer.appendChild(feedCard);
+    });
+}
+
+function dedupeMediaItems(items) {
+    const seen = new Set();
+
+    return items.filter((item) => {
+        const mediaUrl = item.compressedURL || item.fileURL || item.url || item.thumbnailURL || item.thumbnail || '';
+        const name = item.fileName || item.filename || item.title || item.name || '';
+        const stamp = item.uploadedAt?.seconds || item.createdAt || item.createdDate || '';
+        const key = [
+            item.type || 'item',
+            String(mediaUrl).trim().toLowerCase(),
+            String(name).trim().toLowerCase(),
+            String(stamp).trim().toLowerCase()
+        ].join('|');
+
+        if (seen.has(key)) {
+            return false;
+        }
+
+        seen.add(key);
+        return true;
     });
 }
 
