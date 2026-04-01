@@ -305,9 +305,7 @@ async function uploadFiles(files, category, story, type, options = {}) {
         const timestamp = Date.now();
         const uploadId = `${type}-${timestamp}-${Math.random().toString(36).slice(2, 8)}`;
 
-        if (type === "images" && file.type.startsWith("image/")) {
-            compressedDataUrl = await compressImageToDataUrl(file, IMAGE_RTDB_MAX_BYTES);
-        } else if (file.size > MAX_UPLOAD_BYTES) {
+        if (type !== "images" && file.size > MAX_UPLOAD_BYTES) {
             throw new Error(`File "${file.name}" exceeds 1MB. Please upload smaller files.`);
         }
 
@@ -319,22 +317,11 @@ async function uploadFiles(files, category, story, type, options = {}) {
             }
         }
 
-        if (!(type === "images" && compressedDataUrl)) {
-            const fileName = `${timestamp}_${file.name}`;
-            storagePath = `${type}/${fileName}`;
-
-            try {
-                const storageRef = ref(storage, storagePath);
-                const snapshot = await uploadBytes(storageRef, file);
-                downloadURL = await getDownloadURL(snapshot.ref);
-            } catch (error) {
-                if (type === "images" && compressedDataUrl) {
-                    downloadURL = "";
-                } else {
-                    throw error;
-                }
-            }
-        }
+        const fileName = `${timestamp}_${file.name}`;
+        storagePath = `${type}/${fileName}`;
+        const storageRef = ref(storage, storagePath);
+        const snapshot = await uploadBytes(storageRef, file);
+        downloadURL = await getDownloadURL(snapshot.ref);
 
         if (type !== "images") {
             const docData = {
