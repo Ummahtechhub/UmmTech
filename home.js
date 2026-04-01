@@ -26,6 +26,15 @@ const rtdb = getDatabase(app);
 
 let currentUser = null;
 let currentProfile = null;
+const repositoryState = {
+    files: [],
+    images: [],
+    videos: [],
+    highlights: [],
+    filter: 'all',
+    search: '',
+    sort: 'newest'
+};
 const roadmapTracks = [
     { title: "Frontend", href: "https://roadmap.sh/frontend", iconClass: "fas fa-laptop-code", description: "Role roadmap." },
     { title: "Backend", href: "https://roadmap.sh/backend", iconClass: "fas fa-server", description: "Role roadmap." },
@@ -384,6 +393,8 @@ function initializeHeaderUtilities() {
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') {
             closeModal();
+            closeRepositoryPreview();
+            closeFeedMediaViewer();
             chipMenu?.classList.remove('open');
             chipToggle?.setAttribute('aria-expanded', 'false');
         }
@@ -1449,91 +1460,11 @@ const defaultRepoHighlights = [
     }
 ];
 
-async function loadRepository() {
-    loadRepositoryHighlights();
-
-    const filesGrid = document.getElementById('repositoryFilesGrid');
-    const imagesGrid = document.getElementById('repositoryImagesGrid');
-    const videosGrid = document.getElementById('repositoryVideosGrid');
-    if (!filesGrid || !videosGrid || !imagesGrid) return;
-
-    filesGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 30px;">Loading repository files...</p>';
-    imagesGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 30px;">Loading repository images...</p>';
-    videosGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 30px;">Loading repository videos...</p>';
-
-    let files = [];
-    let images = [];
-    let videos = [];
-
-    try {
-        const filesQuery = query(collection(db, 'files'), orderBy('uploadedAt', 'desc'));
-        const imagesQuery = query(collection(db, 'images'), orderBy('uploadedAt', 'desc'));
-        const videosQuery = query(collection(db, 'videos'), orderBy('uploadedAt', 'desc'));
-        const [filesSnap, imagesSnap, videosSnap] = await Promise.all([
-            getDocs(filesQuery),
-            getDocs(imagesQuery),
-            getDocs(videosQuery)
-        ]);
-
-        files = filesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-        images = imagesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-        videos = videosSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    } catch (e) {
-        console.error('Repository load failed:', e);
-    }
-
-    try {
-        const uploadsSnap = await dbGet(dbRef(rtdb, 'uploads'));
-        if (uploadsSnap.exists()) {
-            const uploads = uploadsSnap.val() || {};
-            const rtdbFiles = uploads.files ? Object.values(uploads.files) : [];
-            const rtdbImages = uploads.images ? Object.values(uploads.images) : [];
-            const rtdbVideos = uploads.videos ? Object.values(uploads.videos) : [];
-            if (rtdbFiles.length) files = [...rtdbFiles, ...files];
-            if (rtdbImages.length) images = [...rtdbImages, ...images];
-            if (rtdbVideos.length) videos = [...rtdbVideos, ...videos];
-        }
-    } catch (e) {
-        console.error('Repository realtime load failed:', e);
-    }
-
-    images = dedupeMediaItems(images).filter((item) => Boolean(item.compressedURL || item.fileURL || item.url));
-    videos = dedupeMediaItems(videos).filter((item) => Boolean(item.fileURL || item.url || item.thumbnailURL || item.thumbnail || item.compressedURL));
-
-    filesGrid.innerHTML = '';
-    imagesGrid.innerHTML = '';
-    videosGrid.innerHTML = '';
-
-    if (files.length === 0) {
-        filesGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 30px;">No study notes or reports yet.</p>';
-    } else {
-        files.forEach(file => {
-            filesGrid.appendChild(createRepositoryCard(file, 'file'));
-        });
-    }
-
-    if (images.length === 0) {
-        imagesGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 30px;">No photos yet.</p>';
-    } else {
-        images.forEach(image => {
-            imagesGrid.appendChild(createRepositoryCard(image, 'image'));
-        });
-    }
-
-    if (videos.length === 0) {
-        videosGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 30px;">No short videos yet.</p>';
-    } else {
-        videos.forEach(video => {
-            videosGrid.appendChild(createRepositoryCard(video, 'video'));
-        });
-    }
-}
-
 async function loadRepositoryHighlights() {
     const grid = document.getElementById('repoShowcaseGrid');
-    if (!grid) return;
+    if (!grid) return [];
 
-    grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 20px;">Loading highlights...</p>';
+    grid.innerHTML = '<p class="repository-empty-state">Loading highlights...</p>';
 
     let highlights = [];
 
@@ -1549,14 +1480,147 @@ async function loadRepositoryHighlights() {
         highlights = defaultRepoHighlights;
     }
 
-    grid.innerHTML = '';
+    return highlights;
+}
 
-    highlights.forEach((item) => {
+function initializeRepositoryControls() {
+    const searchInput = document.getElementById('repositorySearch');
+    const sortSelect = document.getElementById('repositorySort');
+
+    if (searchInput && !searchInput.dataset.bound) {
+        searchInput.dataset.bound = 'true';
+        searchInput.addEventListener('input', () => {
+            repositoryState.search = searchInput.value.trim().toLowerCase();
+            renderRepository();
+        });
+    }
+
+    if (sortSelect && !sortSelect.dataset.bound) {
+        sortSelect.dataset.bound = 'true';
+        sortSelect.addEventListener('change', () => {
+            repositoryState.sort = sortSelect.value;
+            renderRepository();
+        });
+    }
+
+    document.querySelectorAll('[data-repo-filter]').forEach((button) => {
+        if (button.dataset.bound) return;
+        button.dataset.bound = 'true';
+        button.addEventListener('click', () => {
+            repositoryState.filter = button.dataset.repoFilter;
+            document.querySelectorAll('[data-repo-filter]').forEach((item) => {
+                item.classList.toggle('active', item === button);
+            });
+            renderRepository();
+        });
+    });
+}
+
+async function loadRepository() {
+    initializeRepositoryControls();
+
+    const filesGrid = document.getElementById('repositoryFilesGrid');
+    const imagesGrid = document.getElementById('repositoryImagesGrid');
+    const videosGrid = document.getElementById('repositoryVideosGrid');
+    if (!filesGrid || !videosGrid || !imagesGrid) return;
+
+    filesGrid.innerHTML = '<p class="repository-empty-state">Loading repository files...</p>';
+    imagesGrid.innerHTML = '<p class="repository-empty-state">Loading repository images...</p>';
+    videosGrid.innerHTML = '<p class="repository-empty-state">Loading repository videos...</p>';
+
+    let files = [];
+    let images = [];
+    let videos = [];
+
+    try {
+        const filesQuery = query(collection(db, 'files'), orderBy('uploadedAt', 'desc'));
+        const imagesQuery = query(collection(db, 'images'), orderBy('uploadedAt', 'desc'));
+        const videosQuery = query(collection(db, 'videos'), orderBy('uploadedAt', 'desc'));
+        const [filesSnap, imagesSnap, videosSnap] = await Promise.all([
+            getDocs(filesQuery),
+            getDocs(imagesQuery),
+            getDocs(videosQuery)
+        ]);
+
+        files = filesSnap.docs.map((docSnap) => ({ id: docSnap.id, __source: 'firestore', ...docSnap.data() }));
+        images = imagesSnap.docs.map((docSnap) => ({ id: docSnap.id, __source: 'firestore', ...docSnap.data() }));
+        videos = videosSnap.docs.map((docSnap) => ({ id: docSnap.id, __source: 'firestore', ...docSnap.data() }));
+    } catch (e) {
+        console.error('Repository load failed:', e);
+    }
+
+    try {
+        const uploadsSnap = await dbGet(dbRef(rtdb, 'uploads'));
+        if (uploadsSnap.exists()) {
+            const uploads = uploadsSnap.val() || {};
+            const rtdbFiles = uploads.files ? Object.values(uploads.files).map((item) => ({ ...item, __source: 'rtdb' })) : [];
+            const rtdbImages = uploads.images ? Object.values(uploads.images).map((item) => ({ ...item, __source: 'rtdb' })) : [];
+            const rtdbVideos = uploads.videos ? Object.values(uploads.videos).map((item) => ({ ...item, __source: 'rtdb' })) : [];
+            if (rtdbFiles.length) files = [...rtdbFiles, ...files];
+            if (rtdbImages.length) images = [...rtdbImages, ...images];
+            if (rtdbVideos.length) videos = [...rtdbVideos, ...videos];
+        }
+    } catch (e) {
+        console.error('Repository realtime load failed:', e);
+    }
+
+    repositoryState.files = dedupeMediaItems(files).filter((item) => Boolean(item.fileURL || item.url));
+    repositoryState.images = dedupeMediaItems(images).filter((item) => Boolean(item.compressedURL || item.fileURL || item.url));
+    repositoryState.videos = dedupeMediaItems(videos).filter((item) => Boolean(item.fileURL || item.url || item.thumbnailURL || item.thumbnail || item.compressedURL));
+    repositoryState.highlights = await loadRepositoryHighlights();
+
+    updateRepositoryCounts();
+    renderRepository();
+}
+
+function updateRepositoryCounts() {
+    const counts = {
+        files: repositoryState.files.length,
+        images: repositoryState.images.length,
+        videos: repositoryState.videos.length,
+        highlights: repositoryState.highlights.length
+    };
+
+    const map = {
+        repoCountFiles: counts.files,
+        repoCountImages: counts.images,
+        repoCountVideos: counts.videos,
+        repoCountHighlights: counts.highlights
+    };
+
+    Object.entries(map).forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = String(value);
+    });
+}
+
+function renderRepository() {
+    renderRepositoryHighlights();
+    renderRepositorySection('files', repositoryState.files, document.getElementById('repositoryFilesGrid'), 'file');
+    renderRepositorySection('images', repositoryState.images, document.getElementById('repositoryImagesGrid'), 'image');
+    renderRepositorySection('videos', repositoryState.videos, document.getElementById('repositoryVideosGrid'), 'video');
+    updateRepositoryVisibility();
+    updateRepositoryResultsLine();
+}
+
+function renderRepositoryHighlights() {
+    const grid = document.getElementById('repoShowcaseGrid');
+    if (!grid) return;
+
+    grid.innerHTML = '';
+    const items = filterAndSortRepositoryItems(repositoryState.highlights, 'highlight');
+
+    if (!items.length) {
+        grid.innerHTML = '<p class="repository-empty-state">No featured highlights match your current search.</p>';
+        return;
+    }
+
+    items.forEach((item) => {
         const link = item.linkUrl || item.link || item.url || '#';
-        const card = document.createElement('a');
+        const card = document.createElement(link && link !== '#' ? 'a' : 'div');
         card.className = 'repo-showcase-link';
-        card.href = link || '#';
-        if (link && link !== '#') {
+        if (card instanceof HTMLAnchorElement) {
+            card.href = link;
             card.target = '_blank';
             card.rel = 'noopener';
         }
@@ -1575,46 +1639,332 @@ async function loadRepositoryHighlights() {
     });
 }
 
-function createRepositoryCard(item, kind) {
-    const card = document.createElement('div');
-    card.className = 'project-card upload-card';
+function renderRepositorySection(sectionKey, items, grid, kind) {
+    if (!grid) return;
+    grid.innerHTML = '';
 
-    const description = item.description || item.story || 'No description provided.';
-    const fileURL = kind === 'video'
-        ? (item.fileURL || item.url || '')
-        : (item.compressedURL || item.fileURL || item.url || '');
-    const thumbURL = item.thumbnailURL || item.thumbnail || item.compressedURL || '';
+    const filteredItems = filterAndSortRepositoryItems(items, kind);
+
+    if (!filteredItems.length) {
+        const message = {
+            file: 'No study notes or reports match your current search.',
+            image: 'No gallery images match your current search.',
+            video: 'No short videos match your current search.'
+        }[kind] || 'No items match your current search.';
+
+        grid.innerHTML = `<p class="repository-empty-state">${message}</p>`;
+        return;
+    }
+
+    filteredItems.forEach((item) => {
+        grid.appendChild(createRepositoryCard(item, kind));
+    });
+}
+
+function filterAndSortRepositoryItems(items, kind) {
+    const queryText = repositoryState.search;
+
+    let filtered = items.filter((item) => {
+        if (repositoryState.filter !== 'all') {
+            const targetKey = repositoryState.filter === 'files' ? 'file'
+                : repositoryState.filter === 'images' ? 'image'
+                : repositoryState.filter === 'videos' ? 'video'
+                : repositoryState.filter === 'highlights' ? 'highlight'
+                : repositoryState.filter;
+            if (targetKey !== kind) return false;
+        }
+
+        if (!queryText) return true;
+
+        const haystack = [
+            item.title,
+            item.fileName,
+            item.filename,
+            item.name,
+            item.description,
+            item.story,
+            item.content,
+            item.category,
+            item.uploadedBy,
+            item.uploadedByName
+        ]
+            .filter(Boolean)
+            .join(' ')
+            .toLowerCase();
+
+        return haystack.includes(queryText);
+    });
+
+    filtered.sort((a, b) => {
+        if (repositoryState.sort === 'title-asc' || repositoryState.sort === 'title-desc') {
+            const titleA = getRepositoryTitle(a, kind).toLowerCase();
+            const titleB = getRepositoryTitle(b, kind).toLowerCase();
+            const compare = titleA.localeCompare(titleB);
+            return repositoryState.sort === 'title-asc' ? compare : -compare;
+        }
+
+        const dateA = getRepositoryTimestamp(a);
+        const dateB = getRepositoryTimestamp(b);
+        return repositoryState.sort === 'oldest' ? dateA - dateB : dateB - dateA;
+    });
+
+    return filtered;
+}
+
+function updateRepositoryVisibility() {
+    const sectionMap = {
+        highlights: document.getElementById('repositoryHighlightsSection'),
+        files: document.getElementById('repositoryFilesSection'),
+        images: document.getElementById('repositoryImagesSection'),
+        videos: document.getElementById('repositoryVideosSection')
+    };
+
+    Object.entries(sectionMap).forEach(([key, element]) => {
+        if (!element) return;
+        const show = repositoryState.filter === 'all' || repositoryState.filter === key;
+        element.classList.toggle('repository-hidden', !show);
+    });
+}
+
+function updateRepositoryResultsLine() {
+    const line = document.getElementById('repositoryResultsLine');
+    if (!line) return;
+
+    const visibleCount =
+        filterAndSortRepositoryItems(repositoryState.files, 'file').length +
+        filterAndSortRepositoryItems(repositoryState.images, 'image').length +
+        filterAndSortRepositoryItems(repositoryState.videos, 'video').length +
+        filterAndSortRepositoryItems(repositoryState.highlights, 'highlight').length;
+
+    const modeLabel = {
+        all: 'all repository items',
+        files: 'file resources',
+        images: 'gallery images',
+        videos: 'short videos',
+        highlights: 'featured highlights'
+    }[repositoryState.filter] || 'repository items';
+
+    line.textContent = `${visibleCount} result${visibleCount === 1 ? '' : 's'} shown for ${modeLabel}.`;
+}
+
+function getRepositoryTitle(item, kind) {
+    return item.title || item.fileName || item.filename || item.name || (kind === 'file' ? 'Resource File' : kind === 'image' ? 'Gallery Image' : 'Video Resource');
+}
+
+function getRepositoryDescription(item) {
+    return item.description || item.story || item.content || 'No description provided yet.';
+}
+
+function getRepositoryMediaUrl(item, kind) {
+    if (kind === 'video') return item.fileURL || item.url || '';
+    if (kind === 'image') return item.compressedURL || item.fileURL || item.url || '';
+    return item.fileURL || item.url || '';
+}
+
+function getRepositoryTimestamp(item) {
+    if (item.uploadedAt?.seconds) return item.uploadedAt.seconds * 1000;
+    if (typeof item.createdAt === 'number') return item.createdAt;
+    const parsed = Date.parse(item.createdDate || item.date || '');
+    return Number.isNaN(parsed) ? 0 : parsed;
+}
+
+function getRepositoryDate(item) {
+    const timestamp = getRepositoryTimestamp(item);
+    return timestamp ? new Date(timestamp).toLocaleDateString() : 'Recent upload';
+}
+
+function getFileIconClass(url = '') {
+    const lower = String(url).toLowerCase();
+    if (lower.endsWith('.pdf')) return 'fas fa-file-pdf';
+    if (lower.endsWith('.doc') || lower.endsWith('.docx')) return 'fas fa-file-word';
+    if (lower.endsWith('.ppt') || lower.endsWith('.pptx')) return 'fas fa-file-powerpoint';
+    if (lower.endsWith('.xls') || lower.endsWith('.xlsx') || lower.endsWith('.csv')) return 'fas fa-file-excel';
+    if (lower.endsWith('.zip') || lower.endsWith('.rar')) return 'fas fa-file-zipper';
+    return 'fas fa-file-lines';
+}
+
+function getFileExtensionLabel(url = '') {
+    const clean = String(url).split('?')[0];
+    const parts = clean.split('.');
+    return parts.length > 1 ? parts.pop().toUpperCase() : 'FILE';
+}
+
+function createRepositoryCard(item, kind) {
+    const card = document.createElement('article');
+    card.className = 'repository-resource-card';
+
+    const title = getRepositoryTitle(item, kind);
+    const description = getRepositoryDescription(item);
+    const mediaUrl = getRepositoryMediaUrl(item, kind);
+    const thumbURL = item.thumbnailURL || item.thumbnail || item.compressedURL || mediaUrl;
+    const uploader = item.uploadedByName || item.uploadedBy || item.author || 'Admin Team';
+    const dateLabel = getRepositoryDate(item);
+    const category = item.category || (kind === 'file' ? 'Document' : kind === 'image' ? 'Gallery' : 'Video');
+    const isAdminUser = JSON.parse(localStorage.getItem('ummah_user') || '{}')?.isAdmin;
 
     let media = '';
     if (kind === 'video') {
         media = `
-            <div class="upload-media upload-media-video">
-                ${fileURL ? `<video src="${fileURL}" ${thumbURL ? `poster="${thumbURL}"` : ''} controls controlsList="nodownload noplaybackrate" preload="metadata" class="upload-media-el"></video>` : `<i class="fas fa-play-circle upload-media-icon"></i>`}
-            </div>
+            <button type="button" class="repository-media-button" onclick="window.openRepositoryPreview('${kind}', '${mediaUrl}', '${title.replace(/'/g, "\\'")}', '${thumbURL.replace(/'/g, "\\'")}')">
+                <div class="upload-media upload-media-video">
+                    ${mediaUrl ? `<video src="${mediaUrl}" ${thumbURL ? `poster="${thumbURL}"` : ''} preload="metadata" class="upload-media-el"></video>` : `<i class="fas fa-play-circle upload-media-icon"></i>`}
+                </div>
+            </button>
         `;
     } else if (kind === 'image') {
-        const imageURL = item.compressedURL || item.fileURL || item.url || '';
         media = `
-            <div class="upload-media upload-media-image">
-                ${imageURL ? `<img src="${imageURL}" alt="" class="upload-media-el">` : `<div class="upload-media-placeholder"><i class="fas fa-image upload-media-icon"></i></div>`}
-            </div>
+            <button type="button" class="repository-media-button" onclick="window.openRepositoryPreview('${kind}', '${mediaUrl}', '${title.replace(/'/g, "\\'")}')">
+                <div class="upload-media upload-media-image">
+                    ${mediaUrl ? `<img src="${mediaUrl}" alt="${title}" class="upload-media-el">` : `<div class="upload-media-placeholder"><i class="fas fa-image upload-media-icon"></i></div>`}
+                </div>
+            </button>
         `;
     } else {
         media = `
-            <div class="upload-media upload-media-file">
-                <i class="fas fa-file-alt upload-media-icon"></i>
+            <div class="repository-file-media">
+                <span class="repository-file-icon"><i class="${getFileIconClass(mediaUrl)}"></i></span>
+                <span class="repository-file-ext">${getFileExtensionLabel(mediaUrl)}</span>
             </div>
         `;
     }
 
     card.innerHTML = `
         ${media}
-        <p class="card-text">${description}</p>
-        ${kind === 'file' && fileURL ? `<a class="btn btn-primary" href="${fileURL}" target="_blank" rel="noopener">Open</a>` : ''}
+        <div class="repository-card-body">
+            <div class="repository-card-topline">
+                <span class="repository-kind-badge">${category}</span>
+                <span class="repository-date">${dateLabel}</span>
+            </div>
+            <h4 class="repository-card-title">${title}</h4>
+            <p class="repository-card-description">${description}</p>
+            <div class="repository-meta-row">
+                <span class="repository-meta-chip"><i class="fas fa-user"></i> ${uploader}</span>
+                <span class="repository-meta-chip"><i class="fas fa-tag"></i> ${kind === 'file' ? 'Downloadable' : kind === 'image' ? 'Preview Ready' : 'Playable'}</span>
+            </div>
+            <div class="repository-actions">
+                ${kind !== 'file' ? `<button type="button" class="repository-action-btn" onclick="window.openRepositoryPreview('${kind}', '${mediaUrl}', '${title.replace(/'/g, "\\'")}', '${thumbURL.replace(/'/g, "\\'")}')"><i class="fas fa-eye"></i> Preview</button>` : ''}
+                ${mediaUrl ? `<a class="repository-action-btn" href="${mediaUrl}" target="_blank" rel="noopener" download><i class="fas fa-download"></i> Download</a>` : ''}
+                ${mediaUrl ? `<button type="button" class="repository-action-btn" onclick="window.shareRepositoryResource('${mediaUrl}', '${title.replace(/'/g, "\\'")}')"><i class="fas fa-share-alt"></i> Share</button>` : ''}
+                ${kind === 'file' && mediaUrl ? `<a class="repository-action-btn" href="${mediaUrl}" target="_blank" rel="noopener"><i class="fas fa-arrow-up-right-from-square"></i> Open</a>` : ''}
+                ${isAdminUser && item.__source === 'firestore' && item.id ? `<button type="button" class="repository-action-btn repository-action-btn-danger" onclick="window.deleteRepositoryItem('${kind}', '${item.id}')"><i class="fas fa-trash"></i> Delete</button>` : ''}
+            </div>
+        </div>
     `;
 
     return card;
 }
+
+function ensureRepositoryPreviewModal() {
+    let overlay = document.getElementById('repositoryPreviewOverlay');
+    if (overlay) return overlay;
+
+    overlay = document.createElement('div');
+    overlay.id = 'repositoryPreviewOverlay';
+    overlay.className = 'repository-preview-overlay';
+    overlay.hidden = true;
+    overlay.innerHTML = `
+        <div class="repository-preview-backdrop" data-close-repository-preview="true"></div>
+        <section class="repository-preview-panel" aria-modal="true" role="dialog" aria-labelledby="repositoryPreviewTitle">
+            <button type="button" class="repository-preview-close" id="repositoryPreviewClose" aria-label="Close preview">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="repository-preview-head">
+                <h3 class="repository-preview-title" id="repositoryPreviewTitle"></h3>
+                <div class="repository-preview-actions">
+                    <a id="repositoryPreviewDownload" class="repository-action-btn" href="#" download target="_blank" rel="noopener">
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                    <button type="button" id="repositoryPreviewShare" class="repository-action-btn">
+                        <i class="fas fa-share-alt"></i> Share
+                    </button>
+                </div>
+            </div>
+            <div class="repository-preview-stage" id="repositoryPreviewStage"></div>
+        </section>
+    `;
+
+    document.body.appendChild(overlay);
+    overlay.querySelector('[data-close-repository-preview="true"]')?.addEventListener('click', closeRepositoryPreview);
+    document.getElementById('repositoryPreviewClose')?.addEventListener('click', closeRepositoryPreview);
+    document.getElementById('repositoryPreviewShare')?.addEventListener('click', () => {
+        const shareButton = document.getElementById('repositoryPreviewShare');
+        if (!shareButton) return;
+        window.shareRepositoryResource(shareButton.dataset.url || '', shareButton.dataset.title || 'Repository Resource');
+    });
+
+    return overlay;
+}
+
+function closeRepositoryPreview() {
+    const overlay = document.getElementById('repositoryPreviewOverlay');
+    if (!overlay) return;
+    overlay.hidden = true;
+    document.body.classList.remove('modal-open');
+}
+
+window.openRepositoryPreview = function(kind, mediaUrl, title, poster = '') {
+    if (!mediaUrl) return;
+    const overlay = ensureRepositoryPreviewModal();
+    const stage = document.getElementById('repositoryPreviewStage');
+    const titleElement = document.getElementById('repositoryPreviewTitle');
+    const downloadLink = document.getElementById('repositoryPreviewDownload');
+    const shareButton = document.getElementById('repositoryPreviewShare');
+    if (!stage || !titleElement || !downloadLink || !shareButton) return;
+
+    titleElement.textContent = title || 'Repository Preview';
+    stage.innerHTML = kind === 'video'
+        ? `<video src="${mediaUrl}" ${poster ? `poster="${poster}"` : ''} controls autoplay playsinline></video>`
+        : `<img src="${mediaUrl}" alt="${title || 'Repository Preview'}">`;
+    downloadLink.href = mediaUrl;
+    downloadLink.setAttribute('download', `${(title || 'repository-resource').replace(/\s+/g, '-').toLowerCase()}`);
+    shareButton.dataset.url = mediaUrl;
+    shareButton.dataset.title = title || 'Repository Resource';
+
+    overlay.hidden = false;
+    document.body.classList.add('modal-open');
+};
+
+window.shareRepositoryResource = async function(resourceUrl, title = 'Repository Resource') {
+    if (!resourceUrl) return;
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title,
+                text: title,
+                url: resourceUrl
+            });
+            return;
+        } catch (error) {
+            if (error && error.name === 'AbortError') return;
+        }
+    }
+
+    try {
+        await navigator.clipboard.writeText(resourceUrl);
+        alert('Resource link copied to clipboard.');
+    } catch (error) {
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(resourceUrl)}`, '_blank', 'noopener');
+    }
+};
+
+window.deleteRepositoryItem = async function(kind, id) {
+    if (!currentUser || !JSON.parse(localStorage.getItem('ummah_user') || '{}')?.isAdmin) {
+        alert('Only admins can remove repository items.');
+        return;
+    }
+
+    const collectionName = kind === 'image' ? 'images' : kind === 'video' ? 'videos' : 'files';
+    const confirmed = window.confirm('Delete this repository item? This action cannot be undone.');
+    if (!confirmed) return;
+
+    try {
+        await deleteDoc(doc(db, collectionName, id));
+        await loadRepository();
+    } catch (error) {
+        console.error('Delete failed:', error);
+        alert('Unable to delete that item right now.');
+    }
+};
 
 async function loadFeed() {
     const feedContainer = document.getElementById('feedContainer');

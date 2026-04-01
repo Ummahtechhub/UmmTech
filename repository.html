@@ -5,40 +5,106 @@
 <link rel="stylesheet" href="main-content.css">
 <link rel="stylesheet" href="responsive.css">
 <div class="content-page" data-page="repository">
-    <div style="background: #2e8b57; padding: 18px 20px; text-align: center; margin-bottom: 12px; color: white;">
-        <h2 class="animated-title glow-title"><i class="fas fa-folder-open"></i> Ummahtechhub</h2>
-        <p>Repository — short materials, studies, reports, and quick videos shared by the admin panel</p>
-    </div>
+    <section class="repository-hero">
+        <div class="repository-hero-copy">
+            <span class="repository-kicker">Resource Library</span>
+            <h2 class="animated-title glow-title"><i class="fas fa-folder-open"></i> Ummah TechHub Repository</h2>
+            <p>Browse study notes, reports, event galleries, quick lessons, and featured resources shared by the Ummah TechHub team.</p>
+        </div>
+        <div class="repository-stats" aria-label="Repository Summary">
+            <article class="repository-stat-card">
+                <span id="repoCountFiles">0</span>
+                <small>Files</small>
+            </article>
+            <article class="repository-stat-card">
+                <span id="repoCountImages">0</span>
+                <small>Images</small>
+            </article>
+            <article class="repository-stat-card">
+                <span id="repoCountVideos">0</span>
+                <small>Videos</small>
+            </article>
+            <article class="repository-stat-card">
+                <span id="repoCountHighlights">0</span>
+                <small>Highlights</small>
+            </article>
+        </div>
+    </section>
 
-    <div class="repo-showcase">
-        <h3><i class="fas fa-camera-retro"></i> Repository Highlights</h3>
-        <p class="repo-showcase-subtext">Snapshots from programs and events that inspire our study journeys.</p>
+    <section class="repository-controls-panel">
+        <div class="repository-search-wrap">
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <input type="search" id="repositorySearch" placeholder="Search notes, images, videos, and highlights">
+        </div>
+        <div class="repository-toolbar">
+            <div class="repository-filter-group" role="tablist" aria-label="Repository Filters">
+                <button type="button" class="repository-filter-btn active" data-repo-filter="all">All</button>
+                <button type="button" class="repository-filter-btn" data-repo-filter="files">Files</button>
+                <button type="button" class="repository-filter-btn" data-repo-filter="images">Images</button>
+                <button type="button" class="repository-filter-btn" data-repo-filter="videos">Videos</button>
+                <button type="button" class="repository-filter-btn" data-repo-filter="highlights">Highlights</button>
+            </div>
+            <label class="repository-sort-wrap" for="repositorySort">
+                <span>Sort</span>
+                <select id="repositorySort">
+                    <option value="newest">Newest</option>
+                    <option value="oldest">Oldest</option>
+                    <option value="title-asc">Title A-Z</option>
+                    <option value="title-desc">Title Z-A</option>
+                </select>
+            </label>
+        </div>
+        <p class="repository-results-line" id="repositoryResultsLine">Loading repository items...</p>
+    </section>
+
+    <section class="repo-showcase repository-block" id="repositoryHighlightsSection">
+        <div class="repository-block-head">
+            <div>
+                <h3><i class="fas fa-camera-retro"></i> Featured Highlights</h3>
+                <p class="repo-showcase-subtext">Snapshots from programs and events that inspire our study journeys.</p>
+            </div>
+        </div>
         <div class="repo-showcase-grid" id="repoShowcaseGrid">
-            <p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 20px;">Loading highlights...</p>
+            <p class="repository-empty-state">Loading highlights...</p>
         </div>
-    </div>
+    </section>
 
-    <div class="content-section" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); margin-bottom: 20px; padding: 20px;">
-        <h3 style="margin-bottom: 10px; color: var(--primary-color);"><i class="fas fa-file-alt"></i> Study Notes & Reports</h3>
-        <p style="color: var(--text-secondary); margin-bottom: 15px;">Documents, notes, and reports uploaded by the admin team.</p>
-        <div class="projects-grid" id="repositoryFilesGrid">
-            <p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 30px;">Loading repository files...</p>
+    <section class="repository-block" id="repositoryFilesSection">
+        <div class="repository-block-head">
+            <div>
+                <h3><i class="fas fa-file-alt"></i> Study Notes & Reports</h3>
+                <p>Documents, notes, reports, and downloadable learning materials.</p>
+            </div>
         </div>
-    </div>
-
-    <div class="content-section" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); margin-bottom: 20px; padding: 20px;">
-        <h3 style="margin-bottom: 10px; color: var(--primary-color);"><i class="fas fa-images"></i> Tech Hub Galleries & Activities</h3>
-        <p style="color: var(--text-secondary); margin-bottom: 15px;">Explore event moments, workshops, and activities curated by the Tech Hub team.</p>
-        <a href="https://drive.google.com/drive/folders/1ThhqjPDZnsXkZH24LzJARgbOdrVsE1AY?usp=sharing" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 10px 16px; background: var(--primary-color); color: #fff; border-radius: 8px; text-decoration: none; font-weight: 600;">
-            Open Tech Hub Gallery
-        </a>
-    </div>
-
-    <div class="content-section" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); padding: 20px;">
-        <h3 style="margin-bottom: 10px; color: var(--primary-color);"><i class="fas fa-video"></i> Short Videos</h3>
-        <p style="color: var(--text-secondary); margin-bottom: 15px;">Quick lessons and highlights curated by the admin team.</p>
-        <div class="projects-grid" id="repositoryVideosGrid">
-            <p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 30px;">Loading repository videos...</p>
+        <div class="repository-grid" id="repositoryFilesGrid">
+            <p class="repository-empty-state">Loading repository files...</p>
         </div>
-    </div>
+    </section>
+
+    <section class="repository-block" id="repositoryImagesSection">
+        <div class="repository-block-head">
+            <div>
+                <h3><i class="fas fa-images"></i> Galleries & Activities</h3>
+                <p>Moments from workshops, certifications, visits, and community programs.</p>
+            </div>
+            <a href="https://drive.google.com/drive/folders/1ThhqjPDZnsXkZH24LzJARgbOdrVsE1AY?usp=sharing" target="_blank" rel="noopener noreferrer" class="repository-secondary-link">
+                Open Full Gallery
+            </a>
+        </div>
+        <div class="repository-grid" id="repositoryImagesGrid">
+            <p class="repository-empty-state">Loading repository images...</p>
+        </div>
+    </section>
+
+    <section class="repository-block" id="repositoryVideosSection">
+        <div class="repository-block-head">
+            <div>
+                <h3><i class="fas fa-video"></i> Short Videos</h3>
+                <p>Quick lessons, showcases, and event highlights curated by the admin team.</p>
+            </div>
+        </div>
+        <div class="repository-grid" id="repositoryVideosGrid">
+            <p class="repository-empty-state">Loading repository videos...</p>
+        </div>
+    </section>
 </div>
