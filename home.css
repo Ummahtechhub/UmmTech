@@ -630,41 +630,101 @@ body.sidebar-open .main-content {
 }
 
 .partner-brand {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
+    display: block;
     margin-bottom: 16px;
-    padding: 8px 12px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
-.partner-brand-mark {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 700;
-    background: rgba(255, 255, 255, 0.18);
+.partner-logo {
+    width: min(220px, 100%);
+    min-height: 148px;
+    border-radius: 22px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.partner-logo-cisco {
+    background: linear-gradient(180deg, #0a84ca 0%, #2cb6ee 100%);
     color: #ffffff;
 }
 
-.partner-brand-text {
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.02em;
+.partner-logo-cisco-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    min-height: 30px;
 }
 
-.partner-brand-cisco .partner-brand-mark {
-    background: #1ba0d7;
+.partner-logo-cisco-bars span {
+    width: 5px;
+    background: #ffffff;
+    border-radius: 999px;
+    opacity: 0.96;
 }
 
-.partner-brand-opswat .partner-brand-mark {
-    background: #00a67e;
+.partner-logo-cisco-bars span:nth-child(1),
+.partner-logo-cisco-bars span:nth-child(9) {
+    height: 11px;
+}
+
+.partner-logo-cisco-bars span:nth-child(2),
+.partner-logo-cisco-bars span:nth-child(8) {
+    height: 18px;
+}
+
+.partner-logo-cisco-bars span:nth-child(3),
+.partner-logo-cisco-bars span:nth-child(7) {
+    height: 12px;
+}
+
+.partner-logo-cisco-bars span:nth-child(4),
+.partner-logo-cisco-bars span:nth-child(6) {
+    height: 17px;
+}
+
+.partner-logo-cisco-bars span:nth-child(5) {
+    height: 26px;
+}
+
+.partner-logo-cisco-word {
+    display: block;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    margin-top: 8px;
+}
+
+.partner-logo-cisco-subtitle {
+    display: block;
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 1.12;
+    max-width: 120px;
+    margin-top: auto;
+}
+
+.partner-logo-opswat {
+    background: linear-gradient(145deg, #4b1e64 0%, #242d62 100%);
+    color: #ffffff;
+}
+
+.partner-logo-opswat-word {
+    display: block;
+    font-size: 21px;
+    font-weight: 300;
+    letter-spacing: 0.12em;
+    margin-top: 8px;
+}
+
+.partner-logo-opswat-subtitle {
+    display: block;
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 1.15;
+    max-width: 88px;
+    margin-top: 6px;
 }
 
 .partner-icon {
@@ -2099,20 +2159,23 @@ body.theme-dark .nav-btn:hover {
 
 /* Feed Media */
 .feed-media {
-    width: 100%;
+    width: auto;
+    max-width: 100%;
     height: auto;
+    max-height: 320px;
     object-fit: contain;
     display: block;
     background: transparent;
+    margin: 0 auto;
 }
 
 .feed-media-image {
-    max-height: none;
     background: transparent;
 }
 
 .feed-media-video {
-    max-height: 360px;
+    width: 100%;
+    max-height: 320px;
     background: #000000;
 }
 
@@ -2121,6 +2184,30 @@ body.theme-dark .nav-btn:hover {
     background: transparent;
     border-bottom: 1px solid rgba(46, 139, 87, 0.12);
     overflow: hidden;
+    padding: 0;
+}
+
+.feed-card-media-stage {
+    width: 100%;
+    min-height: 220px;
+    max-height: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(16, 26, 19, 0.05);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.feed-media-open {
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: zoom-in;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .feed-card-body {
@@ -2140,37 +2227,162 @@ body.theme-dark .nav-btn:hover {
 }
 
 .feed-post-thumb {
-    width: 100%;
-    max-height: none;
+    width: auto;
+    max-width: 100%;
+    max-height: 320px;
     object-fit: contain;
     border-radius: 0;
     display: block;
     background: transparent;
     margin-bottom: 0;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #feedContainer {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 18px;
     align-items: start;
+    justify-items: center;
 }
 
 .feed-card {
     width: 100%;
-    max-width: none;
+    max-width: 360px;
+    border-radius: 18px;
+    overflow: hidden;
+    background: var(--card-bg);
+    border: 1px solid rgba(46, 139, 87, 0.14);
+    box-shadow: 0 12px 24px rgba(12, 35, 22, 0.08);
 }
 
-@media (min-width: 820px) {
-    #feedContainer {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-@media (min-width: 1280px) {
+@media (min-width: 1180px) {
     #feedContainer {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
+}
+
+@media (max-width: 760px) {
+    #feedContainer {
+        grid-template-columns: 1fr;
+    }
+
+    .feed-card {
+        max-width: 100%;
+    }
+
+    .feed-card-media-stage,
+    .feed-media,
+    .feed-post-thumb,
+    .feed-media-video {
+        max-height: 280px;
+    }
+}
+
+.feed-media-viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 1400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.feed-media-viewer[hidden] {
+    display: none !important;
+}
+
+.feed-media-viewer-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(9, 18, 13, 0.72);
+    backdrop-filter: blur(4px);
+}
+
+.feed-media-viewer-panel {
+    position: relative;
+    z-index: 1;
+    width: min(960px, 100%);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 18px;
+    border-radius: 24px;
+    background: rgba(252, 248, 242, 0.98);
+    border: 1px solid rgba(46, 139, 87, 0.18);
+    box-shadow: 0 28px 60px rgba(0, 0, 0, 0.28);
+}
+
+.feed-media-viewer-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(46, 139, 87, 0.1);
+    color: var(--primary-color);
+    cursor: pointer;
+}
+
+.feed-media-viewer-topbar {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    align-items: center;
+    padding-right: 54px;
+}
+
+.feed-media-viewer-topbar h3 {
+    color: var(--text-primary);
+    font-size: 18px;
+    margin: 0;
+}
+
+.feed-media-viewer-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.feed-media-viewer-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(46, 139, 87, 0.14);
+    background: rgba(46, 139, 87, 0.08);
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.feed-media-viewer-stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+    max-height: calc(90vh - 120px);
+    overflow: auto;
+    border-radius: 18px;
+    background: rgba(13, 26, 18, 0.06);
+    padding: 14px;
+}
+
+.feed-media-viewer-stage img {
+    max-width: 100%;
+    max-height: calc(90vh - 160px);
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
 }
 
 @media (max-width: 768px) {

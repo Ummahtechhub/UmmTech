@@ -284,6 +284,52 @@
     font-weight: 700;
 }
 
+.info-contact-socials {
+    margin: 0 0 16px;
+}
+
+.info-contact-socials strong {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.info-contact-social-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.info-contact-social {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    color: #ffffff !important;
+    text-decoration: none;
+    font-weight: 700;
+    box-shadow: 0 10px 20px rgba(10, 31, 19, 0.12);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.info-contact-social:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 24px rgba(10, 31, 19, 0.18);
+}
+
+.info-contact-social-instagram {
+    background: linear-gradient(135deg, #f58529, #dd2a7b, #8134af);
+}
+
+.info-contact-social-facebook {
+    background: #1877f2;
+}
+
+.info-contact-social-x {
+    background: #111111;
+}
+
 @keyframes slideInInfoPanel {
     from {
         opacity: 0;

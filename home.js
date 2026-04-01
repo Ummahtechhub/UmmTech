@@ -124,11 +124,23 @@ const infoModalContent = {
         body: `
             <p><strong>Email:</strong> <a href="mailto:ummahtechhub@gmail.com">ummahtechhub@gmail.com</a></p>
             <p><strong>Location:</strong> Kajiado Umma Main Campus</p>
-            <p><strong>Socials:</strong> 
-                <a href="https://www.instagram.com/ummatechhub?igsh=MXN2bTRhdGFyYjR4dw%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram</a>,
-                <a href="https://www.facebook.com/share/1HzkMNFqZB/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer">Facebook</a>,
-                <a href="https://x.com/ummatechhub105?s=21" target="_blank" rel="noopener noreferrer">X</a>
-            </p>
+            <div class="info-contact-socials">
+                <strong>Socials:</strong>
+                <div class="info-contact-social-list">
+                    <a class="info-contact-social info-contact-social-instagram" href="https://www.instagram.com/ummatechhub?igsh=MXN2bTRhdGFyYjR4dw%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">
+                        <i class="fab fa-instagram" aria-hidden="true"></i>
+                        <span>Instagram</span>
+                    </a>
+                    <a class="info-contact-social info-contact-social-facebook" href="https://www.facebook.com/share/1HzkMNFqZB/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer">
+                        <i class="fab fa-facebook-f" aria-hidden="true"></i>
+                        <span>Facebook</span>
+                    </a>
+                    <a class="info-contact-social info-contact-social-x" href="https://x.com/ummatechhub105?s=21" target="_blank" rel="noopener noreferrer">
+                        <i class="fab fa-x-twitter" aria-hidden="true"></i>
+                        <span>X</span>
+                    </a>
+                </div>
+            </div>
             <div class="info-contact-map">
                 <iframe
                     title="Ummah TechHub Location Map"
@@ -1681,7 +1693,7 @@ async function loadFeed() {
 function createFeedCard(item) {
     const card = document.createElement('div');
     card.className = 'feed-card';
-    card.style.cssText = 'background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; transition: all 0.3s ease; display: flex; flex-direction: column;';
+    card.style.cssText = 'overflow: hidden; transition: all 0.3s ease; display: flex; flex-direction: column;';
     
     const itemKey = String(item.id || item.fileURL || item.url || item.thumbnail || item.title || item.fileName || item.filename || item.createdAt || item.uploadedAt?.seconds || Math.random());
     const itemId = itemKey.replace(/[^a-zA-Z0-9_-]/g, '_');
@@ -1695,7 +1707,7 @@ function createFeedCard(item) {
     
     if (item.type === 'post') {
         content = `
-            ${item.thumbnail ? `<div class="feed-card-media-shell"><img src="${item.thumbnail}" class="feed-post-thumb" alt=""></div>` : ''}
+            ${item.thumbnail ? `<div class="feed-card-media-shell"><img src="${item.thumbnail}" class="feed-post-thumb" alt="${titleText}"></div>` : ''}
             <div class="feed-card-body">
                 <h3>${titleText}</h3>
                 <p style="margin-bottom: 14px;">${descriptionText}</p>
@@ -1710,8 +1722,8 @@ function createFeedCard(item) {
         const videoUrl = item.fileURL || item.url || '';
         content = `
             <div class="feed-card-media-shell">
-                <div style="width: 100%; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-                    ${videoUrl ? `<video src="${videoUrl}" ${poster ? `poster="${poster}"` : ''} class="feed-media feed-media-video" controls controlsList="nodownload noplaybackrate" preload="metadata"></video>` : `<i class="fas fa-play-circle" style="font-size: 60px; color: var(--primary-color); text-shadow: 0 10px 18px rgba(0,0,0,0.7);"></i>`}
+                <div class="feed-card-media-stage">
+                    ${videoUrl ? `<video src="${videoUrl}" ${poster ? `poster="${poster}"` : ''} class="feed-media feed-media-video" controls controlsList="nodownload noplaybackrate" preload="metadata"></video>` : `<i class="fas fa-play-circle" style="font-size: 60px; color: var(--primary-color); text-shadow: 0 10px 18px rgba(0,0,0,0.25);"></i>`}
                 </div>
             </div>
             <div class="feed-card-body">
@@ -1722,7 +1734,9 @@ function createFeedCard(item) {
         const imageUrl = item.compressedURL || item.fileURL || item.url || item.thumbnail || '';
         content = `
             <div class="feed-card-media-shell">
-                <img src="${imageUrl}" class="feed-media feed-media-image" alt="">
+                <button type="button" class="feed-media-open" onclick="window.openFeedMedia('${imageUrl}', '${titleText.replace(/'/g, "\\'")}')">
+                    <img src="${imageUrl}" class="feed-media feed-media-image" alt="${titleText}">
+                </button>
             </div>
             <div class="feed-card-body">
                 <p style="font-size: 13px;">${shortDesc}</p>
@@ -1794,6 +1808,100 @@ function createFeedCard(item) {
     `;
 
     return card;
+}
+
+function ensureFeedMediaViewer() {
+    let viewer = document.getElementById('feedMediaViewer');
+    if (viewer) return viewer;
+
+    viewer = document.createElement('div');
+    viewer.id = 'feedMediaViewer';
+    viewer.className = 'feed-media-viewer';
+    viewer.hidden = true;
+    viewer.innerHTML = `
+        <div class="feed-media-viewer-backdrop" data-feed-viewer-close="true"></div>
+        <section class="feed-media-viewer-panel" aria-modal="true" role="dialog" aria-labelledby="feedMediaViewerTitle">
+            <button type="button" class="feed-media-viewer-close" id="feedMediaViewerClose" aria-label="Close image viewer">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="feed-media-viewer-topbar">
+                <h3 id="feedMediaViewerTitle"></h3>
+                <div class="feed-media-viewer-actions">
+                    <a id="feedMediaDownloadLink" class="feed-media-viewer-action" href="#" download target="_blank" rel="noopener">
+                        <i class="fas fa-download"></i>
+                        <span>Download</span>
+                    </a>
+                    <button type="button" id="feedMediaShareButton" class="feed-media-viewer-action">
+                        <i class="fas fa-share-alt"></i>
+                        <span>Share</span>
+                    </button>
+                </div>
+            </div>
+            <div class="feed-media-viewer-stage">
+                <img id="feedMediaViewerImage" src="" alt="">
+            </div>
+        </section>
+    `;
+
+    document.body.appendChild(viewer);
+
+    viewer.querySelector('[data-feed-viewer-close="true"]')?.addEventListener('click', closeFeedMediaViewer);
+    document.getElementById('feedMediaViewerClose')?.addEventListener('click', closeFeedMediaViewer);
+    document.getElementById('feedMediaShareButton')?.addEventListener('click', shareFeedMedia);
+
+    return viewer;
+}
+
+function closeFeedMediaViewer() {
+    const viewer = document.getElementById('feedMediaViewer');
+    if (!viewer) return;
+    viewer.hidden = true;
+    document.body.classList.remove('modal-open');
+}
+
+window.openFeedMedia = function(imageUrl, title = 'Community Feed Image') {
+    const viewer = ensureFeedMediaViewer();
+    const titleElement = document.getElementById('feedMediaViewerTitle');
+    const imageElement = document.getElementById('feedMediaViewerImage');
+    const downloadLink = document.getElementById('feedMediaDownloadLink');
+    const shareButton = document.getElementById('feedMediaShareButton');
+
+    if (!titleElement || !imageElement || !downloadLink || !shareButton) return;
+
+    titleElement.textContent = title;
+    imageElement.src = imageUrl;
+    imageElement.alt = title;
+    downloadLink.href = imageUrl;
+    downloadLink.setAttribute('download', `${title.replace(/\s+/g, '-').toLowerCase() || 'feed-image'}.jpg`);
+    shareButton.dataset.shareUrl = imageUrl;
+    shareButton.dataset.shareTitle = title;
+
+    viewer.hidden = false;
+    document.body.classList.add('modal-open');
+};
+
+async function shareFeedMedia() {
+    const shareButton = document.getElementById('feedMediaShareButton');
+    if (!shareButton) return;
+
+    const shareUrl = shareButton.dataset.shareUrl || window.location.href;
+    const shareTitle = shareButton.dataset.shareTitle || 'Community Feed Image';
+    const encodedUrl = encodeURIComponent(shareUrl);
+
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: shareTitle,
+                text: shareTitle,
+                url: shareUrl
+            });
+            return;
+        } catch (error) {
+            if (error && error.name === 'AbortError') return;
+        }
+    }
+
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`, '_blank', 'noopener');
 }
 
 function renderComments(itemId) {
