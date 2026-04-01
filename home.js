@@ -108,80 +108,6 @@ const projectIdeaTracks = [
     { title: "Cyber Security Project Ideas", href: "https://roadmap.sh/cyber-security/projects", iconClass: "fas fa-shield-alt", description: "Project ideas." },
     { title: "AI Engineer Project Ideas", href: "https://roadmap.sh/ai-engineer/projects", iconClass: "fas fa-robot", description: "Project ideas." }
 ];
-const infoModalContent = {
-    about: {
-        kicker: 'About Us',
-        title: 'About Ummah TechHub',
-        body: `
-            <p><strong>Ummah TechHub</strong> is a practical technology community built to help students learn, build, collaborate, and grow with confidence in the digital world.</p>
-            <p>We create a space where learners can move beyond theory into <strong>real tech experience</strong> through projects, team collaboration, certification pathways, networking, cybersecurity exposure, and innovation-driven activities.</p>
-            <p>Our focus is to prepare students for modern opportunities in <strong>software development, networking, cybersecurity, digital problem solving, and industry readiness</strong> by connecting classroom potential with practical skill-building.</p>
-            <p>Through events, peer learning, mentorship, and collaborations with recognized academies such as <strong>Cisco Networking Academy</strong> and <strong>OPSWAT Academy</strong>, Ummah TechHub continues to build a culture of curiosity, discipline, creativity, and technical excellence.</p>
-            <div class="info-modal-highlight-grid">
-                <div class="info-modal-highlight">
-                    <i class="fas fa-code"></i>
-                    <span>Project-Based Learning</span>
-                </div>
-                <div class="info-modal-highlight">
-                    <i class="fas fa-user-friends"></i>
-                    <span>Team Collaboration</span>
-                </div>
-                <div class="info-modal-highlight">
-                    <i class="fas fa-certificate"></i>
-                    <span>Certification Pathways</span>
-                </div>
-                <div class="info-modal-highlight">
-                    <i class="fas fa-lightbulb"></i>
-                    <span>Innovation Culture</span>
-                </div>
-            </div>
-        `
-    },
-    contact: {
-        kicker: 'Contact Us',
-        title: 'Contact Ummah TechHub',
-        body: `
-            <div class="info-contact-grid">
-                <div class="info-contact-card">
-                    <div class="info-contact-item">
-                        <i class="fas fa-envelope"></i>
-                        <div>
-                            <strong>Email</strong>
-                            <a href="mailto:ummahtechhub@gmail.com">ummahtechhub@gmail.com</a>
-                        </div>
-                    </div>
-                    <div class="info-contact-item">
-                        <i class="fas fa-location-dot"></i>
-                        <div>
-                            <strong>Location</strong>
-                            <span>Kajiado Umma Main Campus</span>
-                        </div>
-                    </div>
-                    <div class="info-contact-item">
-                        <i class="fas fa-hashtag"></i>
-                        <div>
-                            <strong>Social Links</strong>
-                            <div class="info-contact-links">
-                                <a href="https://www.instagram.com/ummatechhub?igsh=MXN2bTRhdGFyYjR4dw%3D%3D&utm_source=qr" target="_blank" rel="noopener">Instagram</a>
-                                <a href="https://www.facebook.com/share/1HzkMNFqZB/?mibextid=wwXIfr" target="_blank" rel="noopener">Facebook</a>
-                                <a href="https://x.com/ummatechhub105?s=21" target="_blank" rel="noopener">X</a>
-                            </div>
-                        </div>
-                    </div>
-                    <p class="info-contact-note">For collaborations, student programs, training opportunities, certification partnerships, or community engagement, reach out through email or our social platforms and we will respond as soon as possible.</p>
-                </div>
-                <div class="info-contact-map">
-                    <iframe
-                        title="Ummah TechHub Location Map"
-                        src="https://maps.google.com/maps?q=Kajiado%20Umma%20Main%20Campus&t=&z=13&ie=UTF8&iwloc=&output=embed"
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"></iframe>
-                </div>
-            </div>
-        `
-    }
-};
-
 // Dashboard Initialization
 function initDashboard() {
     if (!currentUser) {
@@ -333,11 +259,6 @@ function initializeHeaderUtilities() {
     const chipToggle = document.getElementById('profileChipToggle');
     const chipMenu = document.getElementById('profileChipMenu');
     const headerLogoutBtn = document.getElementById('headerLogoutBtn');
-    const modalOverlay = document.getElementById('infoModalOverlay');
-    const modalClose = document.getElementById('infoModalClose');
-    const modalKicker = document.getElementById('infoModalKicker');
-    const modalTitle = document.getElementById('infoModalTitle');
-    const modalBody = document.getElementById('infoModalBody');
 
     if (chipToggle && chipMenu && !chipToggle.dataset.bound) {
         chipToggle.dataset.bound = 'true';
@@ -373,47 +294,34 @@ function initializeHeaderUtilities() {
         });
     });
 
-    const openModal = (key) => {
-        const content = infoModalContent[key];
-        if (!content || !modalOverlay || !modalKicker || !modalTitle || !modalBody) return;
-        modalKicker.textContent = content.kicker;
-        modalTitle.textContent = content.title;
-        modalBody.innerHTML = content.body;
-        modalOverlay.hidden = false;
-        document.body.classList.add('modal-open');
+    const navigateToSection = (targetId) => {
         chipMenu?.classList.remove('open');
         chipToggle?.setAttribute('aria-expanded', 'false');
+
+        const scrollToTarget = () => {
+            document.getElementById(targetId)?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        };
+
+        if (targetId === 'aboutSection') {
+            document.querySelector('.nav-btn[data-page="overview"]')?.click();
+            window.setTimeout(scrollToTarget, 180);
+            return;
+        }
+
+        scrollToTarget();
     };
 
-    const closeModal = () => {
-        if (!modalOverlay) return;
-        modalOverlay.hidden = true;
-        document.body.classList.remove('modal-open');
-    };
-
-    document.querySelectorAll('[data-open-modal]').forEach((button) => {
+    document.querySelectorAll('[data-scroll-target]').forEach((button) => {
         if (button.dataset.bound) return;
         button.dataset.bound = 'true';
-        button.addEventListener('click', () => openModal(button.dataset.openModal));
+        button.addEventListener('click', () => navigateToSection(button.dataset.scrollTarget));
     });
-
-    if (modalClose && !modalClose.dataset.bound) {
-        modalClose.dataset.bound = 'true';
-        modalClose.addEventListener('click', closeModal);
-    }
-
-    if (modalOverlay && !modalOverlay.dataset.bound) {
-        modalOverlay.dataset.bound = 'true';
-        modalOverlay.addEventListener('click', (event) => {
-            if (event.target instanceof HTMLElement && event.target.dataset.closeModal === 'true') {
-                closeModal();
-            }
-        });
-    }
 
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') {
-            closeModal();
             chipMenu?.classList.remove('open');
             chipToggle?.setAttribute('aria-expanded', 'false');
         }

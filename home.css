@@ -1442,6 +1442,17 @@ select {
     background: rgba(255, 255, 255, 0.12);
 }
 
+.footer-contact-copy {
+    color: rgba(255, 255, 255, 0.78) !important;
+    font-weight: 500 !important;
+    font-size: 14px;
+}
+
+.footer-contact-copy a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
 /* Sidebar Enhancements */
 .sidebar {
     box-shadow: inset -2px 0 4px rgba(0, 0, 0, 0.05);
