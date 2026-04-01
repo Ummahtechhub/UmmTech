@@ -93,8 +93,9 @@
 }
 
 .site-header img[alt="Ummah TechHub Logo"] {
-    height: 80px;
-    width: auto;
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
 }
 
 .site-header .header-center-stack {
@@ -114,7 +115,8 @@
     }
 
     .site-header img[alt="Ummah TechHub Logo"] {
-        height: 56px;
+        width: 60px;
+        height: 60px;
     }
 
     .site-header .brand {

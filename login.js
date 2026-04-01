@@ -12,11 +12,27 @@ const passwordInput = document.getElementById('password');
 const loginBtn = document.getElementById('submit');
 const rememberMe = document.getElementById('checkid');
 const registerLink = document.getElementById('register');
+const togglePasswordBtn = document.getElementById('togglePassword');
 
 const ADMIN_EMAILS = ['admin@ummah.ac.ke', 'admin@ummah.edu'];
 
 // Redirect to register
 registerLink.onclick = () => window.location.href = "register.html";
+
+if (togglePasswordBtn && passwordInput) {
+    const toggleIcon = togglePasswordBtn.querySelector('i');
+
+    togglePasswordBtn.addEventListener('click', () => {
+        const showingPassword = passwordInput.type === 'text';
+        passwordInput.type = showingPassword ? 'password' : 'text';
+        togglePasswordBtn.setAttribute('aria-label', showingPassword ? 'Show password' : 'Hide password');
+        togglePasswordBtn.setAttribute('aria-pressed', String(!showingPassword));
+
+        if (toggleIcon) {
+            toggleIcon.className = showingPassword ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
+        }
+    });
+}
 
 // Prefill if coming from registration demo
 window.addEventListener('load', () => {

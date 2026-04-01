@@ -121,21 +121,52 @@ label {
 }
 
 .input-type .input {
-    padding-right: 44px;
+    padding-right: 76px;
 }
 
-.input-type i {
+.input-icon {
     position: absolute;
-    right: 12px;
+    right: 46px;
     top: 50%;
     transform: translateY(-50%);
     color: var(--primary-color);
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    box-shadow: none;
+    color: var(--primary-color);
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     transition: var(--transition-smooth);
 }
 
-.input-type i:hover {
+.password-toggle::before {
+    display: none;
+}
+
+.password-toggle:hover,
+.password-toggle:focus-visible {
+    background: rgba(46, 139, 87, 0.08);
     color: var(--secondary-color);
+    transform: translateY(-50%);
+}
+
+.password-toggle:focus-visible {
+    outline: 2px solid rgba(46, 139, 87, 0.25);
+    outline-offset: 2px;
 }
 
 button {

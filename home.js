@@ -112,7 +112,7 @@ const projectIdeaTracks = [
 // Dashboard Initialization
 function initDashboard() {
     if (!currentUser) {
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
         return;
     }
 
@@ -174,7 +174,7 @@ function initDashboard() {
 
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
         return;
     }
 
@@ -485,7 +485,7 @@ function initializeLogout() {
             }
             localStorage.removeItem('ummah_user');
             localStorage.removeItem('ummah_profile');
-            window.location.href = 'login.html';
+            window.location.href = 'index.html';
         });
     }
 
@@ -498,7 +498,7 @@ function initializeLogout() {
             }
             localStorage.removeItem('ummah_user');
             localStorage.removeItem('ummah_profile');
-            window.location.href = 'login.html';
+            window.location.href = 'index.html';
         });
     }
 }
@@ -1489,7 +1489,8 @@ async function loadFeed() {
 
 function createFeedCard(item) {
     const card = document.createElement('div');
-    card.style.cssText = 'background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; transition: all 0.3s ease;';
+    card.className = 'feed-card';
+    card.style.cssText = 'background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; transition: all 0.3s ease; display: flex; flex-direction: column;';
     
     const itemKey = String(item.id || item.fileURL || item.url || item.thumbnail || item.title || item.fileName || item.filename || item.createdAt || item.uploadedAt?.seconds || Math.random());
     const itemId = itemKey.replace(/[^a-zA-Z0-9_-]/g, '_');
@@ -1503,11 +1504,11 @@ function createFeedCard(item) {
     
     if (item.type === 'post') {
         content = `
-            <div style="padding: 20px;">
-                <h3 style="margin-bottom: 10px; color: var(--text-primary);">${titleText}</h3>
-                ${item.thumbnail ? `<img src="${item.thumbnail}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 15px;">` : ''}
-                <p style="color: var(--text-secondary); margin-bottom: 15px; line-height: 1.6;">${descriptionText}</p>
-                <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+            ${item.thumbnail ? `<div class="feed-card-media-shell"><img src="${item.thumbnail}" class="feed-post-thumb" alt=""></div>` : ''}
+            <div class="feed-card-body">
+                <h3>${titleText}</h3>
+                <p style="margin-bottom: 14px;">${descriptionText}</p>
+                <div style="display: flex; gap: 10px; margin-bottom: 0; flex-wrap: wrap;">
                     <span class="badge badge-blue">${item.category}</span>
                     <small style="color: #999;">${createdDate}</small>
                 </div>
@@ -1517,21 +1518,23 @@ function createFeedCard(item) {
         const poster = item.thumbnailURL || item.thumbnail || item.compressedURL || '';
         const videoUrl = item.fileURL || item.url || '';
         content = `
-            <div style="padding: 20px;">
-                <div style="width: 100%; height: 260px; background: #000; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+            <div class="feed-card-media-shell">
+                <div style="width: 100%; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center;">
                     ${videoUrl ? `<video src="${videoUrl}" ${poster ? `poster="${poster}"` : ''} class="feed-media feed-media-video" controls controlsList="nodownload noplaybackrate" preload="metadata"></video>` : `<i class="fas fa-play-circle" style="font-size: 60px; color: var(--primary-color); text-shadow: 0 10px 18px rgba(0,0,0,0.7);"></i>`}
                 </div>
-                <p style="color: var(--text-secondary); margin-bottom: 0;">${shortDesc}</p>
+            </div>
+            <div class="feed-card-body">
+                <p>${shortDesc}</p>
             </div>
         `;
     } else if (item.type === 'image') {
         const imageUrl = item.compressedURL || item.fileURL || item.url || item.thumbnail || '';
         content = `
-            <div>
+            <div class="feed-card-media-shell">
                 <img src="${imageUrl}" class="feed-media feed-media-image" alt="">
-                <div style="padding: 15px;">
-                    <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 0;">${shortDesc}</p>
-                </div>
+            </div>
+            <div class="feed-card-body">
+                <p style="font-size: 13px;">${shortDesc}</p>
             </div>
         `;
     }

@@ -16,13 +16,13 @@ let currentUser = null;
 
 onAuthStateChanged(auth, (user) => {
     if (!user) {
-        window.location.href = "login.html";
+        window.location.href = "index.html";
         return;
     }
     const isAdmin = ADMIN_EMAILS.includes(user.email?.toLowerCase() || "");
     if (!isAdmin) {
         alert("Access denied. Admin privileges required.");
-        window.location.href = "login.html";
+        window.location.href = "index.html";
         return;
     }
     currentUser = user;
@@ -50,7 +50,7 @@ async function logout() {
         // ignore
     }
     localStorage.removeItem("ummah_user");
-    window.location.href = "login.html";
+    window.location.href = "index.html";
 }
 
 function showPage(pageId) {

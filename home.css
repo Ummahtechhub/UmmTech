@@ -29,6 +29,15 @@ title {
     --gradient-2: linear-gradient(135deg, rgba(46, 139, 87, 0.1), rgba(102, 205, 170, 0.1));
     --gradient-accent: linear-gradient(135deg, #2e8b57, #4cd964);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --hero-ratio: 16 / 9;
+    --blog-ratio: 3 / 2;
+    --thumb-ratio: 1 / 1;
+    --banner-ratio: 3 / 1;
+    --hero-max-width: 1280px;
+    --hero-max-height: 720px;
+    --card-media-max-height: 320px;
+    --feed-image-max-height: 440px;
+    --feed-video-max-height: 420px;
 }
 
 body {
@@ -437,10 +446,16 @@ body.sidebar-open .main-content {
     padding: 24px 24px 10px;
     border-radius: 16px;
     overflow: hidden;
-    background-size: cover;
+    aspect-ratio: var(--hero-ratio);
+    min-height: 360px;
+    max-width: var(--hero-max-width);
+    max-height: var(--hero-max-height);
+    margin: 0 auto 24px;
+    background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
     box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+    background-color: rgba(255, 255, 255, 0.65);
 }
 
 .overview-hero::before {
@@ -683,7 +698,7 @@ body {
 
 .event-media {
     width: 100%;
-    height: 150px;
+    min-height: 180px;
     background: linear-gradient(135deg, rgba(46, 139, 87, 0.15), rgba(102, 205, 170, 0.1));
     border-radius: 8px;
     display: flex;
@@ -691,13 +706,17 @@ body {
     justify-content: center;
     margin-bottom: 0;
     overflow: hidden;
+    padding: 12px;
 }
 
 .event-media img,
 .event-media video {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    max-height: 220px;
+    height: auto;
+    object-fit: contain;
+    background: #f7f7f7;
+    border-radius: 8px;
 }
 
 .event-card h3 {
@@ -812,7 +831,7 @@ body {
 
 .project-media {
     width: 100%;
-    height: 150px;
+    min-height: 180px;
     background: linear-gradient(135deg, rgba(46, 139, 87, 0.15), rgba(102, 205, 170, 0.1));
     border-radius: 8px;
     display: flex;
@@ -820,13 +839,17 @@ body {
     justify-content: center;
     margin-bottom: 0;
     overflow: hidden;
+    padding: 12px;
 }
 
 .project-media img,
 .project-media video {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    max-height: 220px;
+    height: auto;
+    object-fit: contain;
+    background: #f7f7f7;
+    border-radius: 8px;
 }
 
 .project-header {
@@ -848,25 +871,42 @@ body {
 .upload-card {
     max-width: 360px;
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
 }
 
 .upload-media {
     width: 100%;
-    aspect-ratio: 16 / 9;
-    border-radius: 8px;
+    max-width: 100%;
+    border-radius: 12px 12px 0 0;
     overflow: hidden;
-    margin-bottom: 12px;
-    background: rgba(46, 139, 87, 0.08);
+    margin-bottom: 0;
+    background: #f3f5f7;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 0;
+    min-height: 0;
+    border-bottom: 1px solid rgba(46, 139, 87, 0.12);
+}
+
+.upload-media-image {
+    min-height: 0;
+}
+
+.upload-media-video {
+    min-height: 0;
 }
 
 .upload-media-el {
     width: 100%;
-    height: 100%;
+    height: auto;
+    max-height: 240px;
     object-fit: contain;
-    background: #fff;
+    background: #f3f5f7;
+    border-radius: 0;
+    display: block;
 }
 
 .upload-media-video .upload-media-el {
@@ -875,7 +915,7 @@ body {
 
 .upload-media-placeholder {
     width: 100%;
-    height: 100%;
+    min-height: 180px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -885,6 +925,14 @@ body {
     font-size: 42px;
     color: rgba(46, 139, 87, 0.6);
     text-shadow: 0 6px 14px rgba(0,0,0,0.2);
+}
+
+.upload-card .card-text {
+    margin: 0;
+    padding: 14px 16px 16px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.5;
 }
 
 .status-badge {
@@ -1059,7 +1107,8 @@ body {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background-size: cover;
+    background-size: contain;
+    background-repeat: no-repeat;
     background-position: center;
     animation: profilePicReveal 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1801,10 +1850,11 @@ body.theme-dark .nav-btn:hover {
 
 .repo-showcase-card img {
     width: 100%;
-    height: 260px;
+    height: auto;
+    max-height: 240px;
     object-fit: contain;
     display: block;
-    background: #f8f8f8;
+    background: #f3f5f7;
     transition: transform 240ms ease;
 }
 
@@ -1864,30 +1914,89 @@ body.theme-dark .nav-btn:hover {
 .feed-media {
     width: 100%;
     height: auto;
-    aspect-ratio: 16 / 9;
     object-fit: contain;
     display: block;
-    background: rgba(0, 0, 0, 0.04);
+    background: transparent;
 }
 
 .feed-media-image {
     max-height: none;
-    background: #ffffff;
+    background: transparent;
 }
 
 .feed-media-video {
+    max-height: 360px;
     background: #000000;
 }
+
+.feed-card-media-shell {
+    width: 100%;
+    background: transparent;
+    border-bottom: 1px solid rgba(46, 139, 87, 0.12);
+    overflow: hidden;
+}
+
+.feed-card-body {
+    padding: 14px 16px 16px;
+}
+
+.feed-card-body h3 {
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.feed-card-body p {
+    margin-bottom: 0;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    text-align: left;
+}
+
+.feed-post-thumb {
+    width: 100%;
+    max-height: none;
+    object-fit: contain;
+    border-radius: 0;
+    display: block;
+    background: transparent;
+    margin-bottom: 0;
+}
+
 #feedContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+    align-items: start;
+}
+
+.feed-card {
+    width: 100%;
+    max-width: none;
+}
+
+@media (min-width: 820px) {
+    #feedContainer {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 @media (min-width: 1280px) {
     #feedContainer {
-        display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .overview-hero {
+        min-height: 200px;
+    }
+
+    .upload-media-el,
+    .repo-showcase-card img {
+        max-height: 200px;
+    }
+
+    .feed-media-video {
+        max-height: 220px;
     }
 }

@@ -160,6 +160,7 @@
     }
 
     .site-header img[alt="Ummah TechHub Logo"] {
+        width: 60px;
         height: 60px;
         position: static !important;
     }
