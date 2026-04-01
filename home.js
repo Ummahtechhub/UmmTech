@@ -124,7 +124,11 @@ const infoModalContent = {
         body: `
             <p><strong>Email:</strong> <a href="mailto:ummahtechhub@gmail.com">ummahtechhub@gmail.com</a></p>
             <p><strong>Location:</strong> Kajiado Umma Main Campus</p>
-            <p><strong>Socials:</strong> Follow Ummah TechHub on Instagram, Facebook, and X for updates, events, and community activities.</p>
+            <p><strong>Socials:</strong> 
+                <a href="https://www.instagram.com/ummatechhub?igsh=MXN2bTRhdGFyYjR4dw%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram</a>,
+                <a href="https://www.facebook.com/share/1HzkMNFqZB/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer">Facebook</a>,
+                <a href="https://x.com/ummatechhub105?s=21" target="_blank" rel="noopener noreferrer">X</a>
+            </p>
             <div class="info-contact-map">
                 <iframe
                     title="Ummah TechHub Location Map"
