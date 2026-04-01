@@ -8,9 +8,38 @@
         <h1 class="brand" id="pageTitle" style="margin: 0; animation: fadeInUp 1s ease-out;">Ummah TechHub</h1>
     </div>
     <div class="header-right">
-        <span id="userDisplayName" class="user-name">User</span>
+        <nav class="header-links" aria-label="Secondary">
+            <button type="button" class="header-link-btn" data-open-modal="about">About Us</button>
+            <button type="button" class="header-link-btn" data-open-modal="contact">Contact Us</button>
+        </nav>
+        <div class="profile-chip-wrap">
+            <button type="button" id="profileChipToggle" class="profile-chip" aria-haspopup="menu" aria-expanded="false">
+                <span class="profile-chip-avatar" id="headerProfileAvatar">
+                    <i class="fas fa-user"></i>
+                </span>
+                <span class="profile-chip-name" id="userDisplayName">Me</span>
+                <i class="fas fa-caret-down profile-chip-caret" aria-hidden="true"></i>
+            </button>
+            <div id="profileChipMenu" class="profile-chip-menu" role="menu">
+                <button type="button" class="profile-chip-menu-item" data-page-shortcut="profile" role="menuitem">My Profile</button>
+                <button type="button" class="profile-chip-menu-item" data-page-shortcut="settings" role="menuitem">Settings</button>
+                <button type="button" class="profile-chip-menu-item profile-chip-menu-item-danger" id="headerLogoutBtn" role="menuitem">Logout</button>
+            </div>
+        </div>
     </div>
 </header>
+
+<div id="infoModalOverlay" class="info-modal-overlay" hidden>
+    <div class="info-modal-backdrop" data-close-modal="true"></div>
+    <section class="info-modal" aria-modal="true" role="dialog" aria-labelledby="infoModalTitle">
+        <button type="button" class="info-modal-close" id="infoModalClose" aria-label="Close dialog">
+            <i class="fas fa-times"></i>
+        </button>
+        <span class="info-modal-kicker" id="infoModalKicker">Ummah TechHub</span>
+        <h2 id="infoModalTitle">About Us</h2>
+        <div id="infoModalBody" class="info-modal-body"></div>
+    </section>
+</div>
 
 <style>
 @keyframes fadeInUp {

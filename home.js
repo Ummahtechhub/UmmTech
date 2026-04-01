@@ -108,6 +108,28 @@ const projectIdeaTracks = [
     { title: "Cyber Security Project Ideas", href: "https://roadmap.sh/cyber-security/projects", iconClass: "fas fa-shield-alt", description: "Project ideas." },
     { title: "AI Engineer Project Ideas", href: "https://roadmap.sh/ai-engineer/projects", iconClass: "fas fa-robot", description: "Project ideas." }
 ];
+const infoModalContent = {
+    about: {
+        kicker: 'About Us',
+        title: 'About Ummah TechHub',
+        body: `
+            <p><strong>Ummah TechHub</strong> is a student-centered innovation and learning community focused on practical technology growth, collaboration, and digital opportunity.</p>
+            <p>We create space for students to build projects, sharpen technical skills, join teams, and access industry-relevant learning through partnerships, events, and mentorship.</p>
+            <p>Our goal is to help learners move from interest to confidence through real exposure in software, networking, cybersecurity, teamwork, and certification pathways.</p>
+        `
+    },
+    contact: {
+        kicker: 'Contact Us',
+        title: 'Contact Ummah TechHub',
+        body: `
+            <p><strong>Email:</strong> ummahtechhub@gmail.com</p>
+            <p><strong>Instagram:</strong> @ummatechhub</p>
+            <p><strong>Facebook:</strong> Ummah TechHub</p>
+            <p><strong>X:</strong> @ummatechhub105</p>
+            <p>For collaborations, student opportunities, training, or community programs, reach out through our social platforms or email and we will get back to you.</p>
+        `
+    }
+};
 
 // Dashboard Initialization
 function initDashboard() {
@@ -126,6 +148,17 @@ function initDashboard() {
 
     if (userDisplayName) userDisplayName.textContent = displayName.split(' ')[0];
     if (userWelcomeName) userWelcomeName.textContent = displayName.split(' ')[0];
+
+    const headerProfileAvatar = document.getElementById('headerProfileAvatar');
+    if (headerProfileAvatar) {
+        if (profile.profileImage) {
+            headerProfileAvatar.style.backgroundImage = `url(${profile.profileImage})`;
+            headerProfileAvatar.innerHTML = '';
+        } else {
+            headerProfileAvatar.style.backgroundImage = '';
+            headerProfileAvatar.innerHTML = '<i class="fas fa-user"></i>';
+        }
+    }
 
     // Populate profile form
     const profileName = document.getElementById('profileName');
@@ -158,6 +191,7 @@ function initDashboard() {
     // Initialize sidebar and navigation
     initializeSidebar();
     initializeLogout();
+    initializeHeaderUtilities();
     initializeQuickAccess();
     renderRoadmapCards();
     initializeProfileForm();
@@ -193,23 +227,33 @@ onAuthStateChanged(auth, async (user) => {
 
 function setCertificationCounts() {
     document.querySelectorAll('.certification-value[data-count-target]').forEach((element) => {
-        element.textContent = '0+';
+        element.textContent = '+0';
     });
+}
+
+function stopCertificationAnimation() {
+    if (window._certificationAnimationFrame) {
+        cancelAnimationFrame(window._certificationAnimationFrame);
+        window._certificationAnimationFrame = null;
+    }
+
+    if (window._certificationAnimationTimeout) {
+        clearTimeout(window._certificationAnimationTimeout);
+        window._certificationAnimationTimeout = null;
+    }
 }
 
 function animateCertificationCounts() {
     const counters = document.querySelectorAll('.certification-value[data-count-target]');
     if (!counters.length) return;
 
-    if (window._certificationAnimationFrame) {
-        cancelAnimationFrame(window._certificationAnimationFrame);
-    }
+    stopCertificationAnimation();
 
     counters.forEach((element) => {
-        element.textContent = '0+';
+        element.textContent = '+0';
     });
 
-    const duration = 1400;
+    const duration = 2200;
     const start = performance.now();
 
     const tick = (now) => {
@@ -219,15 +263,110 @@ function animateCertificationCounts() {
         counters.forEach((element) => {
             const target = Number(element.dataset.countTarget || 0);
             const value = Math.round(target * eased);
-            element.textContent = `${value}+`;
+            element.textContent = `+${value}`;
         });
 
         if (progress < 1) {
             window._certificationAnimationFrame = requestAnimationFrame(tick);
+        } else {
+            window._certificationAnimationTimeout = window.setTimeout(() => {
+                animateCertificationCounts();
+            }, 700);
         }
     };
 
     window._certificationAnimationFrame = requestAnimationFrame(tick);
+}
+
+function initializeHeaderUtilities() {
+    const chipToggle = document.getElementById('profileChipToggle');
+    const chipMenu = document.getElementById('profileChipMenu');
+    const headerLogoutBtn = document.getElementById('headerLogoutBtn');
+    const modalOverlay = document.getElementById('infoModalOverlay');
+    const modalClose = document.getElementById('infoModalClose');
+    const modalKicker = document.getElementById('infoModalKicker');
+    const modalTitle = document.getElementById('infoModalTitle');
+    const modalBody = document.getElementById('infoModalBody');
+
+    if (chipToggle && chipMenu && !chipToggle.dataset.bound) {
+        chipToggle.dataset.bound = 'true';
+        chipToggle.addEventListener('click', (event) => {
+            event.stopPropagation();
+            const isOpen = chipMenu.classList.toggle('open');
+            chipToggle.setAttribute('aria-expanded', String(isOpen));
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!chipMenu.contains(event.target) && !chipToggle.contains(event.target)) {
+                chipMenu.classList.remove('open');
+                chipToggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    if (headerLogoutBtn && !headerLogoutBtn.dataset.bound) {
+        headerLogoutBtn.dataset.bound = 'true';
+        headerLogoutBtn.addEventListener('click', () => {
+            document.getElementById('logoutBtn')?.click();
+        });
+    }
+
+    document.querySelectorAll('[data-page-shortcut]').forEach((button) => {
+        if (button.dataset.bound) return;
+        button.dataset.bound = 'true';
+        button.addEventListener('click', () => {
+            const page = button.dataset.pageShortcut;
+            document.querySelector(`.nav-btn[data-page="${page}"]`)?.click();
+            chipMenu?.classList.remove('open');
+            chipToggle?.setAttribute('aria-expanded', 'false');
+        });
+    });
+
+    const openModal = (key) => {
+        const content = infoModalContent[key];
+        if (!content || !modalOverlay || !modalKicker || !modalTitle || !modalBody) return;
+        modalKicker.textContent = content.kicker;
+        modalTitle.textContent = content.title;
+        modalBody.innerHTML = content.body;
+        modalOverlay.hidden = false;
+        document.body.classList.add('modal-open');
+        chipMenu?.classList.remove('open');
+        chipToggle?.setAttribute('aria-expanded', 'false');
+    };
+
+    const closeModal = () => {
+        if (!modalOverlay) return;
+        modalOverlay.hidden = true;
+        document.body.classList.remove('modal-open');
+    };
+
+    document.querySelectorAll('[data-open-modal]').forEach((button) => {
+        if (button.dataset.bound) return;
+        button.dataset.bound = 'true';
+        button.addEventListener('click', () => openModal(button.dataset.openModal));
+    });
+
+    if (modalClose && !modalClose.dataset.bound) {
+        modalClose.dataset.bound = 'true';
+        modalClose.addEventListener('click', closeModal);
+    }
+
+    if (modalOverlay && !modalOverlay.dataset.bound) {
+        modalOverlay.dataset.bound = 'true';
+        modalOverlay.addEventListener('click', (event) => {
+            if (event.target instanceof HTMLElement && event.target.dataset.closeModal === 'true') {
+                closeModal();
+            }
+        });
+    }
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeModal();
+            chipMenu?.classList.remove('open');
+            chipToggle?.setAttribute('aria-expanded', 'false');
+        }
+    });
 }
 
 async function migrateLocalStorageToFirestore() {
@@ -487,6 +626,8 @@ function initializeNavigation() {
             if (page === 'overview') {
                 updateStats();
                 animateCertificationCounts();
+            } else {
+                stopCertificationAnimation();
             }
 
             // Close sidebar on mobile

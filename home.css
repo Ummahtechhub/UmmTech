@@ -1419,6 +1419,29 @@ select {
     text-align: center;
 }
 
+.footer-site-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.footer-link-btn {
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.06);
+    color: #ffffff;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.footer-link-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
 /* Sidebar Enhancements */
 .sidebar {
     box-shadow: inset -2px 0 4px rgba(0, 0, 0, 0.05);
